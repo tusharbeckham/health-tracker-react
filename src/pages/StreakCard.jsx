@@ -1,3 +1,5 @@
+import { Flame } from "lucide-react";
+
 function StreakCard() {
   const days = ["M", "T", "W", "T", "F", "S", "S"];
   const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
@@ -27,12 +29,12 @@ function StreakCard() {
       <div
         style={{
           display: "flex",
-          alignItems: "baseline",
-          gap: "8px",
+          alignItems: "center",
+          gap: "10px",
           marginBottom: "20px",
         }}
       >
-        <span style={{ fontSize: "1.8rem" }}>🔥</span>
+        <Flame size={36} color="#ff9f0a" />
         <span
           style={{
             fontSize: "3rem",

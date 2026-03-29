@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Footprints, Trophy } from "lucide-react";
 
 function StepCounter() {
@@ -6,7 +6,6 @@ function StepCounter() {
     () => Number(localStorage.getItem("steps")) || 0,
   );
   const goal = Number(localStorage.getItem("goal_steps")) || 10000;
-  const inputRef = useRef();
 
   useEffect(() => {
     let lastAcc = 0;
@@ -15,11 +14,9 @@ function StepCounter() {
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
       if (!acc) return;
-
       const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
       const delta = Math.abs(magnitude - lastAcc);
       const now = Date.now();
-
       if (delta > 15 && now - lastStep > 400) {
         lastStep = now;
         setSteps((prev) => {
@@ -36,9 +33,8 @@ function StepCounter() {
       typeof DeviceMotionEvent.requestPermission === "function"
     ) {
       DeviceMotionEvent.requestPermission().then((response) => {
-        if (response === "granted") {
+        if (response === "granted")
           window.addEventListener("devicemotion", handleMotion);
-        }
       });
     } else {
       window.addEventListener("devicemotion", handleMotion);
@@ -46,16 +42,6 @@ function StepCounter() {
 
     return () => window.removeEventListener("devicemotion", handleMotion);
   }, []);
-
-  function handleAdd() {
-    let amount = Number(inputRef.current.value);
-    if (amount > 0) {
-      const newSteps = steps + amount;
-      setSteps(newSteps);
-      localStorage.setItem("steps", newSteps);
-      inputRef.current.value = "";
-    }
-  }
 
   let percent = Math.min((steps / goal) * 100, 100);
   let isGoalDone = steps >= goal;
@@ -81,7 +67,6 @@ function StepCounter() {
       >
         Steps Today
       </p>
-
       <div
         style={{
           display: "flex",
@@ -133,7 +118,7 @@ function StepCounter() {
           background: "#111",
           borderRadius: "99px",
           height: "5px",
-          marginBottom: "18px",
+          marginBottom: "8px",
           overflow: "hidden",
         }}
       >
@@ -150,51 +135,16 @@ function StepCounter() {
           }}
         ></div>
       </div>
-
-      <input
-        ref={inputRef}
-        type="number"
-        placeholder="Enter steps manually"
+      <p
         style={{
-          width: "100%",
-          padding: "13px 16px",
-          background: "#111",
-          border: "1px solid #222",
-          borderRadius: "14px",
-          color: "#fff",
-          fontSize: "1rem",
-          marginBottom: "10px",
-          outline: "none",
-        }}
-      />
-
-      <button
-        onClick={handleAdd}
-        style={{
-          width: "100%",
-          padding: "14px",
-          background: "linear-gradient(135deg, #30d158, #25a244)",
-          border: "none",
-          borderRadius: "14px",
-          color: "#000",
-          fontSize: "1rem",
-          fontWeight: "700",
-          cursor: "pointer",
-          boxShadow: "0 4px 20px rgba(48, 209, 88, 0.3)",
+          fontSize: "0.75rem",
+          color: "#555",
+          marginBottom: "0",
+          textAlign: "right",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-          }}
-        >
-          <Footprints size={18} />
-          Log Steps
-        </div>
-      </button>
+        {Math.round(percent)}% of daily goal
+      </p>
     </div>
   );
 }

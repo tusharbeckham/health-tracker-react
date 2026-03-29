@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { CheckCircle, Droplets } from "lucide-react";
 
 function WaterTracker() {
   const [water, setWater] = useState(
     () => Number(localStorage.getItem("water")) || 0,
   );
-  const goal = 8;
+  const goal = Number(localStorage.getItem("goal_water")) || 8;
 
   function addGlass() {
     if (water < goal) {
@@ -38,8 +39,8 @@ function WaterTracker() {
       <div
         style={{
           display: "flex",
-          alignItems: "baseline",
-          gap: "8px",
+          alignItems: "center",
+          gap: "10px",
           marginBottom: "16px",
         }}
       >
@@ -53,9 +54,34 @@ function WaterTracker() {
         >
           {water}
         </span>
-        <span style={{ fontSize: "1rem", color: "#444" }}>/ 8 glasses</span>
-        {water >= goal && <span>✅</span>}
+        <span style={{ fontSize: "1rem", color: "#444" }}>
+          / {goal} glasses
+        </span>
+        {water >= goal && <CheckCircle size={24} color="#0a84ff" />}
       </div>
+
+      {water >= goal && (
+        <div
+          style={{
+            background: "#00101a",
+            border: "1px solid #0a84ff",
+            borderRadius: "14px",
+            padding: "12px 16px",
+            marginBottom: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <Droplets size={18} color="#0a84ff" />
+          <span
+            style={{ color: "#0a84ff", fontSize: "0.9rem", fontWeight: "600" }}
+          >
+            Water goal reached!
+          </span>
+        </div>
+      )}
+
       <div style={{ display: "flex", gap: "6px", marginBottom: "16px" }}>
         {Array.from({ length: goal }).map((_, i) => (
           <div
@@ -86,7 +112,17 @@ function WaterTracker() {
           boxShadow: "0 4px 20px rgba(10, 132, 255, 0.3)",
         }}
       >
-        + Add Glass
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <Droplets size={18} />
+          Add Glass
+        </div>
       </button>
     </div>
   );
