@@ -15,12 +15,19 @@ function WorkoutLog() {
   const isGoalDone = totalCal >= calGoal;
 
   function addWorkout() {
-    if (name === "" || Number(cal) <= 0) {
-      alert("Please enter valid exercise and calories!");
+    const calories = Number(cal);
+
+    if (name === "") {
+      alert("Please enter exercise name!");
       return;
     }
-    const newWorkouts = [...workouts, { name, calories: Number(cal) }];
-    const newTotal = totalCal + Number(cal);
+    if (calories < 10 || calories > 2000) {
+      alert("Calories must be between 10 and 2,000!");
+      return;
+    }
+
+    const newWorkouts = [...workouts, { name, calories }];
+    const newTotal = totalCal + calories;
     setWorkouts(newWorkouts);
     setTotalCal(newTotal);
     localStorage.setItem("workouts", JSON.stringify(newWorkouts));
@@ -114,9 +121,11 @@ function WorkoutLog() {
       />
       <input
         type="number"
-        placeholder="Calories burned"
+        placeholder="Calories burned (10 - 2,000)"
         value={cal}
         onChange={(e) => setCal(e.target.value)}
+        min={10}
+        max={2000}
         style={{
           width: "100%",
           padding: "13px 16px",
@@ -125,10 +134,14 @@ function WorkoutLog() {
           borderRadius: "14px",
           color: "#fff",
           fontSize: "1rem",
-          marginBottom: "10px",
+          marginBottom: "4px",
           outline: "none",
         }}
       />
+      <p style={{ fontSize: "0.7rem", color: "#444", marginBottom: "10px" }}>
+        10 – 2,000 cal
+      </p>
+
       <button
         onClick={addWorkout}
         style={{
