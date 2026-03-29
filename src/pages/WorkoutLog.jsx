@@ -1,18 +1,30 @@
 import { useState } from "react";
+import { Dumbbell, Flame, CheckCircle } from "lucide-react";
 
 function WorkoutLog() {
-  const [workouts, setWorkouts] = useState([]);
-  const [totalCal, setTotalCal] = useState(0);
+  const [workouts, setWorkouts] = useState(
+    () => JSON.parse(localStorage.getItem("workouts")) || [],
+  );
+  const [totalCal, setTotalCal] = useState(
+    () => Number(localStorage.getItem("totalCalories")) || 0,
+  );
   const [name, setName] = useState("");
   const [cal, setCal] = useState("");
+
+  const calGoal = Number(localStorage.getItem("goal_calories")) || 500;
+  const isGoalDone = totalCal >= calGoal;
 
   function addWorkout() {
     if (name === "" || Number(cal) <= 0) {
       alert("Please enter valid exercise and calories!");
       return;
     }
-    setWorkouts([...workouts, { name, calories: Number(cal) }]);
-    setTotalCal(totalCal + Number(cal));
+    const newWorkouts = [...workouts, { name, calories: Number(cal) }];
+    const newTotal = totalCal + Number(cal);
+    setWorkouts(newWorkouts);
+    setTotalCal(newTotal);
+    localStorage.setItem("workouts", JSON.stringify(newWorkouts));
+    localStorage.setItem("totalCalories", newTotal);
     setName("");
     setCal("");
   }
@@ -38,11 +50,12 @@ function WorkoutLog() {
       >
         Workout Log
       </p>
+
       <div
         style={{
           display: "flex",
-          alignItems: "baseline",
-          gap: "8px",
+          alignItems: "center",
+          gap: "10px",
           marginBottom: "16px",
         }}
       >
@@ -50,14 +63,38 @@ function WorkoutLog() {
           style={{
             fontSize: "3rem",
             fontWeight: "800",
-            color: totalCal > 0 ? "#ff9f0a" : "#fff",
+            color: isGoalDone ? "#ff9f0a" : "#fff",
             lineHeight: 1,
           }}
         >
           {totalCal}
         </span>
-        <span style={{ fontSize: "1rem", color: "#444" }}>cal burned</span>
+        <span style={{ fontSize: "1rem", color: "#444" }}>/ {calGoal} cal</span>
+        {isGoalDone && <CheckCircle size={24} color="#ff9f0a" />}
       </div>
+
+      {isGoalDone && (
+        <div
+          style={{
+            background: "#1a1200",
+            border: "1px solid #ff9f0a",
+            borderRadius: "14px",
+            padding: "12px 16px",
+            marginBottom: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <Flame size={18} color="#ff9f0a" />
+          <span
+            style={{ color: "#ff9f0a", fontSize: "0.9rem", fontWeight: "600" }}
+          >
+            Calorie goal reached!
+          </span>
+        </div>
+      )}
+
       <input
         type="text"
         placeholder="Exercise name"
@@ -107,8 +144,19 @@ function WorkoutLog() {
           boxShadow: "0 4px 20px rgba(255, 159, 10, 0.3)",
         }}
       >
-        Log Workout
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <Dumbbell size={18} />
+          Log Workout
+        </div>
       </button>
+
       <div style={{ marginTop: "14px" }}>
         {workouts.map((w, i) => (
           <div

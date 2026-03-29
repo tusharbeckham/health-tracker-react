@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import { Footprints, Trophy } from "lucide-react";
 
 function StepCounter() {
   const [steps, setSteps] = useState(
     () => Number(localStorage.getItem("steps")) || 0,
   );
-  const goal = 10000;
+  const goal = Number(localStorage.getItem("goal_steps")) || 10000;
   const inputRef = useRef();
 
   useEffect(() => {
@@ -19,7 +20,7 @@ function StepCounter() {
       const delta = Math.abs(magnitude - lastAcc);
       const now = Date.now();
 
-      if (delta > 8 && now - lastStep > 300) {
+      if (delta > 15 && now - lastStep > 400) {
         lastStep = now;
         setSteps((prev) => {
           const newSteps = prev + 1;
@@ -30,7 +31,6 @@ function StepCounter() {
       lastAcc = magnitude;
     }
 
-    // iOS permission
     if (
       typeof DeviceMotionEvent !== "undefined" &&
       typeof DeviceMotionEvent.requestPermission === "function"
@@ -44,9 +44,7 @@ function StepCounter() {
       window.addEventListener("devicemotion", handleMotion);
     }
 
-    return () => {
-      window.removeEventListener("devicemotion", handleMotion);
-    };
+    return () => window.removeEventListener("devicemotion", handleMotion);
   }, []);
 
   function handleAdd() {
@@ -83,11 +81,12 @@ function StepCounter() {
       >
         Steps Today
       </p>
+
       <div
         style={{
           display: "flex",
-          alignItems: "baseline",
-          gap: "8px",
+          alignItems: "center",
+          gap: "10px",
           marginBottom: "14px",
         }}
       >
@@ -101,9 +100,34 @@ function StepCounter() {
         >
           {steps.toLocaleString()}
         </span>
-        <span style={{ fontSize: "1rem", color: "#444" }}>/ 10,000</span>
-        {isGoalDone && <span style={{ fontSize: "1.2rem" }}>🎉</span>}
+        <span style={{ fontSize: "1rem", color: "#444" }}>
+          / {goal.toLocaleString()}
+        </span>
+        {isGoalDone && <Trophy size={24} color="#30d158" />}
       </div>
+
+      {isGoalDone && (
+        <div
+          style={{
+            background: "#001a0a",
+            border: "1px solid #30d158",
+            borderRadius: "14px",
+            padding: "12px 16px",
+            marginBottom: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <Footprints size={18} color="#30d158" />
+          <span
+            style={{ color: "#30d158", fontSize: "0.9rem", fontWeight: "600" }}
+          >
+            Step goal reached!
+          </span>
+        </div>
+      )}
+
       <div
         style={{
           background: "#111",
@@ -126,6 +150,7 @@ function StepCounter() {
           }}
         ></div>
       </div>
+
       <input
         ref={inputRef}
         type="number"
@@ -142,6 +167,7 @@ function StepCounter() {
           outline: "none",
         }}
       />
+
       <button
         onClick={handleAdd}
         style={{
@@ -157,7 +183,17 @@ function StepCounter() {
           boxShadow: "0 4px 20px rgba(48, 209, 88, 0.3)",
         }}
       >
-        Log Steps
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <Footprints size={18} />
+          Log Steps
+        </div>
       </button>
     </div>
   );

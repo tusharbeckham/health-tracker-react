@@ -1,4 +1,25 @@
+import { useState } from "react";
+
 function Profile() {
+  const [form, setForm] = useState({
+    name: localStorage.getItem("profile_name") || "",
+    age: localStorage.getItem("profile_age") || "",
+    weight: localStorage.getItem("profile_weight") || "",
+    height: localStorage.getItem("profile_height") || "",
+  });
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function handleSave() {
+    localStorage.setItem("profile_name", form.name);
+    localStorage.setItem("profile_age", form.age);
+    localStorage.setItem("profile_weight", form.weight);
+    localStorage.setItem("profile_height", form.height);
+    alert("Profile saved!");
+  }
+
   return (
     <div className="page animate">
       <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
@@ -30,10 +51,30 @@ function Profile() {
         </p>
 
         {[
-          { label: "Name", placeholder: "Your name", type: "text" },
-          { label: "Age", placeholder: "Your age", type: "number" },
-          { label: "Weight (kg)", placeholder: "Your weight", type: "number" },
-          { label: "Height (cm)", placeholder: "Your height", type: "number" },
+          {
+            label: "Name",
+            name: "name",
+            placeholder: "Your name",
+            type: "text",
+          },
+          {
+            label: "Age",
+            name: "age",
+            placeholder: "Your age",
+            type: "number",
+          },
+          {
+            label: "Weight (kg)",
+            name: "weight",
+            placeholder: "Your weight",
+            type: "number",
+          },
+          {
+            label: "Height (cm)",
+            name: "height",
+            placeholder: "Your height",
+            type: "number",
+          },
         ].map((field) => (
           <div key={field.label} style={{ marginBottom: "14px" }}>
             <p
@@ -43,7 +84,10 @@ function Profile() {
             </p>
             <input
               type={field.type}
+              name={field.name}
               placeholder={field.placeholder}
+              value={form[field.name]}
+              onChange={handleChange}
               style={{
                 width: "100%",
                 padding: "13px 16px",
@@ -59,6 +103,7 @@ function Profile() {
         ))}
 
         <button
+          onClick={handleSave}
           style={{
             width: "100%",
             padding: "14px",

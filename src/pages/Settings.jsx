@@ -1,4 +1,42 @@
+import { useState } from "react";
+import { Target, Droplets, Flame, Bell } from "lucide-react";
+
 function Settings() {
+  const [goals, setGoals] = useState({
+    steps: localStorage.getItem("goal_steps") || "10000",
+    water: localStorage.getItem("goal_water") || "8",
+    calories: localStorage.getItem("goal_calories") || "500",
+  });
+
+  function handleChange(e) {
+    setGoals({ ...goals, [e.target.name]: e.target.value });
+  }
+
+  function handleSave() {
+    localStorage.setItem("goal_steps", goals.steps);
+    localStorage.setItem("goal_water", goals.water);
+    localStorage.setItem("goal_calories", goals.calories);
+    alert("Goals saved!");
+  }
+
+  const fields = [
+    {
+      label: "Step Goal",
+      name: "steps",
+      icon: <Target size={16} color="#30d158" />,
+    },
+    {
+      label: "Water Goal (glasses)",
+      name: "water",
+      icon: <Droplets size={16} color="#0a84ff" />,
+    },
+    {
+      label: "Calorie Burn Goal",
+      name: "calories",
+      icon: <Flame size={16} color="#ff9f0a" />,
+    },
+  ];
+
   return (
     <div className="page animate">
       <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
@@ -29,20 +67,24 @@ function Settings() {
           Daily Goals
         </p>
 
-        {[
-          { label: "Step Goal", defaultValue: "10000", type: "number" },
-          { label: "Water Goal (glasses)", defaultValue: "8", type: "number" },
-          { label: "Calorie Goal", defaultValue: "500", type: "number" },
-        ].map((field) => (
-          <div key={field.label} style={{ marginBottom: "14px" }}>
-            <p
-              style={{ fontSize: "0.8rem", color: "#888", marginBottom: "6px" }}
+        {fields.map((field) => (
+          <div key={field.name} style={{ marginBottom: "14px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                marginBottom: "6px",
+              }}
             >
-              {field.label}
-            </p>
+              {field.icon}
+              <p style={{ fontSize: "0.8rem", color: "#888" }}>{field.label}</p>
+            </div>
             <input
-              type={field.type}
-              defaultValue={field.defaultValue}
+              type="number"
+              name={field.name}
+              value={goals[field.name]}
+              onChange={handleChange}
               style={{
                 width: "100%",
                 padding: "13px 16px",
@@ -58,6 +100,7 @@ function Settings() {
         ))}
 
         <button
+          onClick={handleSave}
           style={{
             width: "100%",
             padding: "14px",

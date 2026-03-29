@@ -1,21 +1,23 @@
+import { Sunrise, Droplets, Dumbbell, Heart } from "lucide-react";
+
 function NotificationBanner() {
   const hour = new Date().getHours();
 
   let message = "Stay consistent today!";
-  let emoji = "💪";
+  let Icon = Heart;
   let color = "#30d158";
 
   if (hour >= 6 && hour < 12) {
     message = "Morning! Start logging your steps!";
-    emoji = "🌅";
+    Icon = Sunrise;
     color = "#ff9f0a";
   } else if (hour >= 12 && hour < 14) {
     message = "Lunch time! Drink some water!";
-    emoji = "💧";
+    Icon = Droplets;
     color = "#0a84ff";
   } else if (hour >= 17 && hour < 20) {
     message = "Evening workout time!";
-    emoji = "🏃";
+    Icon = Dumbbell;
     color = "#ff6b6b";
   }
 
@@ -34,7 +36,7 @@ function NotificationBanner() {
         fontWeight: "500",
       }}
     >
-      <span style={{ fontSize: "1.3rem" }}>{emoji}</span>
+      <Icon size={20} color={color} />
       <span style={{ color: "#ccc" }}>{message}</span>
     </div>
   );
