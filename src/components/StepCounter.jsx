@@ -10,14 +10,22 @@ function StepCounter() {
   useEffect(() => {
     let lastAcc = 0;
     let lastStep = 0;
+    let stepBuffer = [];
 
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
       if (!acc) return;
+
       const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
-      const delta = Math.abs(magnitude - lastAcc);
+
+      stepBuffer.push(magnitude);
+      if (stepBuffer.length > 4) stepBuffer.shift();
+      const avg = stepBuffer.reduce((a, b) => a + b, 0) / stepBuffer.length;
+
+      const delta = Math.abs(avg - lastAcc);
       const now = Date.now();
-      if (delta > 15 && now - lastStep > 400) {
+
+      if (delta > 3 && delta < 20 && now - lastStep > 500) {
         lastStep = now;
         setSteps((prev) => {
           const newSteps = prev + 1;
@@ -25,7 +33,7 @@ function StepCounter() {
           return newSteps;
         });
       }
-      lastAcc = magnitude;
+      lastAcc = avg;
     }
 
     if (
