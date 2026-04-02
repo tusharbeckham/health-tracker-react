@@ -1,58 +1,100 @@
-import { useState, useEffect } from "react";
-import { Footprints, Trophy } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Footprints, Trophy, Play } from "lucide-react";
 
 function StepCounter() {
   const [steps, setSteps] = useState(
     () => Number(localStorage.getItem("steps")) || 0,
   );
+  const [isTracking, setIsTracking] = useState(false);
+
   const goal = Number(localStorage.getItem("goal_steps")) || 10000;
 
+  // Auto calculations
+  const kms = (steps * 0.000762).toFixed(2);
+  const calories = Math.round(steps * 0.04);
+
+  // Refs for motion detection (to avoid stale closures)
+  const lastAccRef = useRef(0);
+  const lastStepRef = useRef(0);
+  const stepBufferRef = useRef([]);
+  const motionListenerRef = useRef(null);
+
+  // Save kms and calories whenever steps change
   useEffect(() => {
-    let lastAcc = 0;
-    let lastStep = 0;
-    let stepBuffer = [];
+    localStorage.setItem("kms", kms);
+    localStorage.setItem("stepCalories", calories);
+  }, [steps, kms, calories]);
 
-    function handleMotion(event) {
-      const acc = event.accelerationIncludingGravity;
-      if (!acc) return;
+  // Step detection logic
+  const handleMotion = (event) => {
+    const acc = event.accelerationIncludingGravity;
+    if (!acc) return;
 
-      const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+    const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
 
-      stepBuffer.push(magnitude);
-      if (stepBuffer.length > 4) stepBuffer.shift();
-      const avg = stepBuffer.reduce((a, b) => a + b, 0) / stepBuffer.length;
+    stepBufferRef.current.push(magnitude);
+    if (stepBufferRef.current.length > 6) stepBufferRef.current.shift();
 
-      const delta = Math.abs(avg - lastAcc);
-      const now = Date.now();
+    const avg =
+      stepBufferRef.current.reduce((a, b) => a + b, 0) /
+      stepBufferRef.current.length;
+    const delta = Math.abs(avg - lastAccRef.current);
+    const now = Date.now();
 
-      if (delta > 3 && delta < 20 && now - lastStep > 500) {
-        lastStep = now;
-        setSteps((prev) => {
-          const newSteps = prev + 1;
-          localStorage.setItem("steps", newSteps);
-          return newSteps;
-        });
-      }
-      lastAcc = avg;
-    }
+    // Improved thresholds (tune kar sakte ho testing ke baad)
+    if (delta > 2.8 && delta < 18 && now - lastStepRef.current > 450) {
+      lastStepRef.current = now;
 
-    if (
-      typeof DeviceMotionEvent !== "undefined" &&
-      typeof DeviceMotionEvent.requestPermission === "function"
-    ) {
-      DeviceMotionEvent.requestPermission().then((response) => {
-        if (response === "granted")
-          window.addEventListener("devicemotion", handleMotion);
+      setSteps((prev) => {
+        const newSteps = prev + 1;
+        localStorage.setItem("steps", newSteps);
+        return newSteps;
       });
-    } else {
-      window.addEventListener("devicemotion", handleMotion);
     }
 
-    return () => window.removeEventListener("devicemotion", handleMotion);
+    lastAccRef.current = avg;
+  };
+
+  // Start motion tracking
+  const startTracking = async () => {
+    if (isTracking) return;
+
+    try {
+      if (
+        typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission === "function"
+      ) {
+        // iOS 13+
+        const response = await DeviceMotionEvent.requestPermission();
+        if (response !== "granted") {
+          alert("Motion permission denied. Step tracking won't work.");
+          return;
+        }
+      }
+
+      // Add listener
+      window.addEventListener("devicemotion", handleMotion);
+      motionListenerRef.current = handleMotion;
+
+      setIsTracking(true);
+      alert("Step tracking started! Keep your phone in pocket/bag and walk.");
+    } catch (err) {
+      console.error("Motion permission error:", err);
+      alert("Failed to enable motion tracking.");
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (motionListenerRef.current) {
+        window.removeEventListener("devicemotion", motionListenerRef.current);
+      }
+    };
   }, []);
 
-  let percent = Math.min((steps / goal) * 100, 100);
-  let isGoalDone = steps >= goal;
+  const percent = Math.min((steps / goal) * 100, 100);
+  const isGoalDone = steps >= goal;
 
   return (
     <div
@@ -75,12 +117,13 @@ function StepCounter() {
       >
         Steps Today
       </p>
+
       <div
         style={{
           display: "flex",
           alignItems: "center",
           gap: "10px",
-          marginBottom: "14px",
+          marginBottom: "8px",
         }}
       >
         <span
@@ -99,6 +142,98 @@ function StepCounter() {
         {isGoalDone && <Trophy size={24} color="#30d158" />}
       </div>
 
+      {/* KMs + Calories */}
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          marginBottom: "14px",
+        }}
+      >
+        <div
+          style={{
+            background: "#111",
+            borderRadius: "12px",
+            padding: "10px 14px",
+            flex: 1,
+            border: "1px solid #222",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "0.65rem",
+              color: "#555",
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+            }}
+          >
+            Distance
+          </p>
+          <p
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: "700",
+              color: "#0a84ff",
+            }}
+          >
+            {kms} km
+          </p>
+        </div>
+
+        <div
+          style={{
+            background: "#111",
+            borderRadius: "12px",
+            padding: "10px 14px",
+            flex: 1,
+            border: "1px solid #222",
+          }}
+        >
+          <p
+            style={{
+              fontSize: "0.65rem",
+              color: "#555",
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+            }}
+          >
+            Calories
+          </p>
+          <p
+            style={{
+              fontSize: "1.2rem",
+              fontWeight: "700",
+              color: "#ff9f0a",
+            }}
+          >
+            {calories} cal
+          </p>
+        </div>
+      </div>
+
+      {!isTracking && (
+        <button
+          onClick={startTracking}
+          style={{
+            background: "#30d158",
+            color: "#000",
+            border: "none",
+            borderRadius: "12px",
+            padding: "12px 20px",
+            fontWeight: "600",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            marginBottom: "14px",
+            cursor: "pointer",
+            width: "100%",
+            justifyContent: "center",
+          }}
+        >
+          <Play size={18} /> Enable Step Tracking
+        </button>
+      )}
+
       {isGoalDone && (
         <div
           style={{
@@ -114,13 +249,18 @@ function StepCounter() {
         >
           <Footprints size={18} color="#30d158" />
           <span
-            style={{ color: "#30d158", fontSize: "0.9rem", fontWeight: "600" }}
+            style={{
+              color: "#30d158",
+              fontSize: "0.9rem",
+              fontWeight: "600",
+            }}
           >
-            Step goal reached!
+            Step goal reached! 🎉
           </span>
         </div>
       )}
 
+      {/* Progress Bar */}
       <div
         style={{
           background: "#111",
@@ -143,11 +283,11 @@ function StepCounter() {
           }}
         ></div>
       </div>
+
       <p
         style={{
           fontSize: "0.75rem",
           color: "#555",
-          marginBottom: "0",
           textAlign: "right",
         }}
       >
