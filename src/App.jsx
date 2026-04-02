@@ -8,15 +8,35 @@ import "./App.css";
 function App() {
   const [activePage, setActivePage] = useState("home");
 
-  // Auto daily reset
   useEffect(() => {
     const savedDate = localStorage.getItem("savedDate");
     const todayDate = new Date().toLocaleDateString();
+
     if (savedDate !== todayDate) {
+      // Naya din — data reset karo
       localStorage.removeItem("steps");
       localStorage.removeItem("water");
       localStorage.removeItem("workouts");
       localStorage.removeItem("totalCalories");
+
+      // Streak update karo
+      const lastDate = localStorage.getItem("lastStreakDate");
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayDate = yesterday.toLocaleDateString();
+
+      let streak = Number(localStorage.getItem("streak")) || 0;
+
+      if (lastDate === yesterdayDate) {
+        // Kal bhi aaya tha — streak badhao
+        streak = streak + 1;
+      } else if (lastDate !== todayDate) {
+        // Skip kiya — reset
+        streak = 1;
+      }
+
+      localStorage.setItem("streak", streak);
+      localStorage.setItem("lastStreakDate", todayDate);
       localStorage.setItem("savedDate", todayDate);
     }
   }, []);

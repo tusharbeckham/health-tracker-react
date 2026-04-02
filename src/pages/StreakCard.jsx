@@ -3,7 +3,9 @@ import { Flame } from "lucide-react";
 function StreakCard() {
   const days = ["M", "T", "W", "T", "F", "S", "S"];
   const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-  const streak = 1;
+
+  // localStorage se streak lo
+  const streak = Number(localStorage.getItem("streak")) || 1;
 
   return (
     <div
