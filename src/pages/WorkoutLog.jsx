@@ -1,5 +1,41 @@
 import { useState } from "react";
-import { Dumbbell, Flame, CheckCircle } from "lucide-react";
+import { Dumbbell, Flame, CheckCircle, Clock } from "lucide-react";
+
+// MET values — accurate calorie calculation
+const exerciseMET = {
+  running: 9.8,
+  walking: 3.5,
+  cycling: 7.5,
+  swimming: 8.0,
+  "jump rope": 12.3,
+  yoga: 3.0,
+  gym: 5.0,
+  "weight training": 5.0,
+  hiit: 10.0,
+  football: 8.0,
+  basketball: 8.0,
+  cricket: 5.0,
+  badminton: 7.0,
+  dancing: 5.5,
+  "climbing stairs": 8.0,
+  default: 5.0,
+};
+
+function getCalories(exerciseName, durationMins) {
+  const weight = Number(localStorage.getItem("profile_weight")) || 70;
+  const name = exerciseName.toLowerCase();
+  let met = exerciseMET.default;
+
+  for (const key in exerciseMET) {
+    if (name.includes(key)) {
+      met = exerciseMET[key];
+      break;
+    }
+  }
+
+  // Formula: Calories = MET × weight(kg) × duration(hours)
+  return Math.round(met * weight * (durationMins / 60));
+}
 
 function WorkoutLog() {
   const [workouts, setWorkouts] = useState(
@@ -9,31 +45,34 @@ function WorkoutLog() {
     () => Number(localStorage.getItem("totalCalories")) || 0,
   );
   const [name, setName] = useState("");
-  const [cal, setCal] = useState("");
+  const [duration, setDuration] = useState("");
 
   const calGoal = Number(localStorage.getItem("goal_calories")) || 500;
   const isGoalDone = totalCal >= calGoal;
 
   function addWorkout() {
-    const calories = Number(cal);
-
     if (name === "") {
       alert("Please enter exercise name!");
       return;
     }
-    if (calories < 10 || calories > 2000) {
-      alert("Calories must be between 10 and 2,000!");
+    if (Number(duration) < 1 || Number(duration) > 300) {
+      alert("Duration must be between 1 and 300 minutes!");
       return;
     }
 
-    const newWorkouts = [...workouts, { name, calories }];
+    const calories = getCalories(name, Number(duration));
+    const newWorkouts = [
+      ...workouts,
+      { name, duration: Number(duration), calories },
+    ];
     const newTotal = totalCal + calories;
+
     setWorkouts(newWorkouts);
     setTotalCal(newTotal);
     localStorage.setItem("workouts", JSON.stringify(newWorkouts));
     localStorage.setItem("totalCalories", newTotal);
     setName("");
-    setCal("");
+    setDuration("");
   }
 
   return (
@@ -104,7 +143,7 @@ function WorkoutLog() {
 
       <input
         type="text"
-        placeholder="Exercise name"
+        placeholder="Exercise (e.g. Running, Yoga, Gym)"
         value={name}
         onChange={(e) => setName(e.target.value)}
         style={{
@@ -119,28 +158,50 @@ function WorkoutLog() {
           outline: "none",
         }}
       />
-      <input
-        type="number"
-        placeholder="Calories burned (10 - 2,000)"
-        value={cal}
-        onChange={(e) => setCal(e.target.value)}
-        min={10}
-        max={2000}
-        style={{
-          width: "100%",
-          padding: "13px 16px",
-          background: "#111",
-          border: "1px solid #222",
-          borderRadius: "14px",
-          color: "#fff",
-          fontSize: "1rem",
-          marginBottom: "4px",
-          outline: "none",
-        }}
-      />
-      <p style={{ fontSize: "0.7rem", color: "#444", marginBottom: "10px" }}>
-        10 – 2,000 cal
-      </p>
+
+      <div style={{ position: "relative", marginBottom: "10px" }}>
+        <input
+          type="number"
+          placeholder="Duration (minutes)"
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
+          min={1}
+          max={300}
+          style={{
+            width: "100%",
+            padding: "13px 16px",
+            background: "#111",
+            border: "1px solid #222",
+            borderRadius: "14px",
+            color: "#fff",
+            fontSize: "1rem",
+            outline: "none",
+          }}
+        />
+        <Clock
+          size={16}
+          color="#555"
+          style={{
+            position: "absolute",
+            right: "16px",
+            top: "50%",
+            transform: "translateY(-50%)",
+          }}
+        />
+      </div>
+
+      {name && duration && (
+        <p
+          style={{
+            fontSize: "0.8rem",
+            color: "#ff9f0a",
+            marginBottom: "10px",
+            textAlign: "center",
+          }}
+        >
+          ≈ {getCalories(name, Number(duration))} calories will be burned
+        </p>
+      )}
 
       <button
         onClick={addWorkout}
@@ -181,10 +242,20 @@ function WorkoutLog() {
               marginBottom: "8px",
               display: "flex",
               justifyContent: "space-between",
+              alignItems: "center",
               border: "1px solid #222",
             }}
           >
-            <span style={{ color: "#ccc" }}>{w.name}</span>
+            <div>
+              <span style={{ color: "#ccc", fontSize: "0.9rem" }}>
+                {w.name}
+              </span>
+              <p
+                style={{ color: "#555", fontSize: "0.75rem", marginTop: "2px" }}
+              >
+                {w.duration} mins
+              </p>
+            </div>
             <span style={{ color: "#ff9f0a", fontWeight: "700" }}>
               {w.calories} cal
             </span>

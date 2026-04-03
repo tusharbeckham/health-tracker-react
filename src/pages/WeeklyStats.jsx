@@ -1,6 +1,9 @@
+import { useState } from "react";
 import Ring from "../components/Ring";
+import { X, Footprints, Droplets, Flame, MapPin } from "lucide-react";
 
 function WeeklyStats() {
+  const [selectedDay, setSelectedDay] = useState(null);
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const weeklyData = JSON.parse(localStorage.getItem("weeklyData")) || {};
 
@@ -8,7 +11,6 @@ function WeeklyStats() {
   const waterGoal = Number(localStorage.getItem("goal_water")) || 8;
   const calGoal = Number(localStorage.getItem("goal_calories")) || 500;
 
-  // Weekly totals
   const totalSteps = days.reduce(
     (sum, d) => sum + (weeklyData[d]?.steps || 0),
     0,
@@ -27,134 +29,241 @@ function WeeklyStats() {
   const weeklyWaterGoal = waterGoal * 7;
   const weeklyCalGoal = calGoal * 7;
 
+  const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-        borderRadius: "24px",
-        padding: "22px",
-        marginBottom: "14px",
-        border: "1px solid #2a2a2a",
-      }}
-    >
-      <p
-        style={{
-          fontSize: "0.7rem",
-          color: "#555",
-          textTransform: "uppercase",
-          letterSpacing: "2px",
-          marginBottom: "16px",
-        }}
-      >
-        Weekly Summary
-      </p>
-
-      {/* Rings */}
+    <>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "24px",
+          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
+          borderRadius: "24px",
+          padding: "22px",
+          marginBottom: "14px",
+          border: "1px solid #2a2a2a",
         }}
       >
-        <Ring
-          percent={Math.min((totalSteps / weeklyStepGoal) * 100, 100)}
-          color="#30d158"
-          size={75}
-          stroke={7}
-          label="Steps"
-          value={totalSteps.toLocaleString()}
-        />
-        <Ring
-          percent={Math.min((totalKms / (stepGoal * 7 * 0.000762)) * 100, 100)}
-          color="#0a84ff"
-          size={75}
-          stroke={7}
-          label="KMs"
-          value={totalKms.toFixed(1) + " km"}
-        />
-        <Ring
-          percent={Math.min((totalWater / weeklyWaterGoal) * 100, 100)}
-          color="#5e5ce6"
-          size={75}
-          stroke={7}
-          label="Water"
-          value={totalWater + " gl"}
-        />
-        <Ring
-          percent={Math.min((totalCals / weeklyCalGoal) * 100, 100)}
-          color="#ff9f0a"
-          size={75}
-          stroke={7}
-          label="Calories"
-          value={totalCals + " cal"}
-        />
-      </div>
+        <p
+          style={{
+            fontSize: "0.7rem",
+            color: "#555",
+            textTransform: "uppercase",
+            letterSpacing: "2px",
+            marginBottom: "16px",
+          }}
+        >
+          Weekly Summary
+        </p>
 
-      {/* Daily bars */}
-      <p
-        style={{
-          fontSize: "0.7rem",
-          color: "#555",
-          textTransform: "uppercase",
-          letterSpacing: "2px",
-          marginBottom: "12px",
-        }}
-      >
-        Daily Steps
-      </p>
-      <div
-        style={{
-          display: "flex",
-          gap: "6px",
-          alignItems: "flex-end",
-          height: "60px",
-        }}
-      >
-        {days.map((day) => {
-          const daySteps = weeklyData[day]?.steps || 0;
-          const height = Math.max((daySteps / stepGoal) * 60, 4);
-          const isToday =
-            days[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1] ===
-            day;
-          return (
-            <div
-              key={day}
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
+        {/* Rings */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "24px",
+          }}
+        >
+          <Ring
+            percent={Math.min((totalSteps / weeklyStepGoal) * 100, 100)}
+            color="#30d158"
+            size={75}
+            stroke={7}
+            label="Steps"
+            value={totalSteps.toLocaleString()}
+          />
+          <Ring
+            percent={Math.min(
+              (totalKms / (stepGoal * 7 * 0.000762)) * 100,
+              100,
+            )}
+            color="#0a84ff"
+            size={75}
+            stroke={7}
+            label="KMs"
+            value={totalKms.toFixed(1) + " km"}
+          />
+          <Ring
+            percent={Math.min((totalWater / weeklyWaterGoal) * 100, 100)}
+            color="#5e5ce6"
+            size={75}
+            stroke={7}
+            label="Water"
+            value={totalWater + " gl"}
+          />
+          <Ring
+            percent={Math.min((totalCals / weeklyCalGoal) * 100, 100)}
+            color="#ff9f0a"
+            size={75}
+            stroke={7}
+            label="Cals"
+            value={totalCals + " cal"}
+          />
+        </div>
+
+        {/* Daily bars */}
+        <p
+          style={{
+            fontSize: "0.7rem",
+            color: "#555",
+            textTransform: "uppercase",
+            letterSpacing: "2px",
+            marginBottom: "12px",
+          }}
+        >
+          Tap a day for details
+        </p>
+        <div
+          style={{
+            display: "flex",
+            gap: "6px",
+            alignItems: "flex-end",
+            height: "70px",
+          }}
+        >
+          {days.map((day, i) => {
+            const daySteps = weeklyData[day]?.steps || 0;
+            const height = Math.max((daySteps / stepGoal) * 60, 4);
+            const isToday = i === todayIndex;
+            const hasData = daySteps > 0;
+
+            return (
               <div
+                key={day}
+                onClick={() => hasData && setSelectedDay(day)}
                 style={{
-                  width: "100%",
-                  height: height + "px",
-                  background: isToday
-                    ? "#30d158"
-                    : daySteps >= stepGoal
-                      ? "#25a244"
-                      : "#2a2a2a",
-                  borderRadius: "6px",
-                  boxShadow: isToday ? "0 0 10px rgba(48,209,88,0.4)" : "none",
-                  transition: "height 0.4s ease",
-                }}
-              ></div>
-              <span
-                style={{
-                  fontSize: "0.6rem",
-                  color: isToday ? "#30d158" : "#444",
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "6px",
+                  cursor: hasData ? "pointer" : "default",
                 }}
               >
-                {day}
-              </span>
-            </div>
-          );
-        })}
+                <div
+                  style={{
+                    width: "100%",
+                    height: height + "px",
+                    background: isToday
+                      ? "#30d158"
+                      : hasData
+                        ? "#25a244"
+                        : "#2a2a2a",
+                    borderRadius: "6px",
+                    boxShadow: isToday
+                      ? "0 0 10px rgba(48,209,88,0.4)"
+                      : "none",
+                    transition: "height 0.4s ease, opacity 0.2s",
+                    opacity: hasData || isToday ? 1 : 0.4,
+                  }}
+                ></div>
+                <span
+                  style={{
+                    fontSize: "0.6rem",
+                    color: isToday ? "#30d158" : "#444",
+                  }}
+                >
+                  {day}
+                </span>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      {/* Day Detail Modal */}
+      {selectedDay && (
+        <div className="modal-overlay" onClick={() => setSelectedDay(null)}>
+          <div className="modal-sheet" onClick={(e) => e.stopPropagation()}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <h2 style={{ fontSize: "1.4rem", fontWeight: "800" }}>
+                {selectedDay}'s Stats
+              </h2>
+              <button
+                onClick={() => setSelectedDay(null)}
+                style={{
+                  background: "#2a2a2a",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "32px",
+                  height: "32px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                }}
+              >
+                <X size={16} color="#fff" />
+              </button>
+            </div>
+
+            {[
+              {
+                icon: <Footprints size={18} color="#30d158" />,
+                label: "Steps",
+                value: (weeklyData[selectedDay]?.steps || 0).toLocaleString(),
+                color: "#30d158",
+              },
+              {
+                icon: <MapPin size={18} color="#0a84ff" />,
+                label: "Distance",
+                value: (weeklyData[selectedDay]?.kms || 0).toFixed(2) + " km",
+                color: "#0a84ff",
+              },
+              {
+                icon: <Droplets size={18} color="#5e5ce6" />,
+                label: "Water",
+                value: (weeklyData[selectedDay]?.water || 0) + " glasses",
+                color: "#5e5ce6",
+              },
+              {
+                icon: <Flame size={18} color="#ff9f0a" />,
+                label: "Calories Burned",
+                value: (weeklyData[selectedDay]?.calories || 0) + " cal",
+                color: "#ff9f0a",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  background: "#111",
+                  borderRadius: "14px",
+                  padding: "14px 16px",
+                  marginBottom: "10px",
+                  border: "1px solid #222",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "10px" }}
+                >
+                  {item.icon}
+                  <span style={{ color: "#888", fontSize: "0.9rem" }}>
+                    {item.label}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    color: item.color,
+                    fontWeight: "700",
+                    fontSize: "1rem",
+                  }}
+                >
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

@@ -9,17 +9,21 @@ function App() {
   const [activePage, setActivePage] = useState("home");
 
   useEffect(() => {
+    // Theme apply karo
+    const theme = localStorage.getItem("theme") || "dark";
+    document.body.className = `theme-${theme}`;
+  }, []);
+
+  useEffect(() => {
     const savedDate = localStorage.getItem("savedDate");
     const todayDate = new Date().toLocaleDateString();
 
-    // Pehli baar open kiya — date set karo
     if (!savedDate) {
       localStorage.setItem("savedDate", todayDate);
       return;
     }
 
     if (savedDate !== todayDate) {
-      // Aaj ka data weekly history mein save karo
       const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
         new Date().getDay()
       ];
@@ -33,8 +37,6 @@ function App() {
       };
 
       localStorage.setItem("weeklyData", JSON.stringify(weeklyData));
-
-      // Reset today's data
       localStorage.removeItem("steps");
       localStorage.removeItem("water");
       localStorage.removeItem("workouts");
@@ -42,7 +44,6 @@ function App() {
       localStorage.removeItem("kms");
       localStorage.removeItem("stepCalories");
 
-      // Streak update
       const lastDate = localStorage.getItem("lastStreakDate");
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
@@ -65,7 +66,11 @@ function App() {
     <div>
       {activePage === "home" && <Dashboard />}
       {activePage === "profile" && <Profile />}
-      {activePage === "settings" && <Settings />}
+      {activePage === "settings" && (
+        <Settings
+          onThemeChange={(t) => (document.body.className = `theme-${t}`)}
+        />
+      )}
       <BottomNav activePage={activePage} setActivePage={setActivePage} />
     </div>
   );

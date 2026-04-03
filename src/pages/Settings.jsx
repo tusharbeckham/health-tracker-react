@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Target, Droplets, Flame, Bell } from "lucide-react";
+import { Target, Droplets, Flame, Bell, Moon, Sun } from "lucide-react";
 import Toast from "../components/Toast";
 
-function Settings() {
+function Settings({ onThemeChange }) {
   const [goals, setGoals] = useState({
     steps: localStorage.getItem("goal_steps") || "10000",
     water: localStorage.getItem("goal_water") || "8",
@@ -11,7 +11,9 @@ function Settings() {
   const [notifications, setNotifications] = useState(
     localStorage.getItem("notifications") === "true" || false,
   );
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState("");
 
   function handleChange(e) {
     setGoals({ ...goals, [e.target.name]: e.target.value });
@@ -23,27 +25,38 @@ function Settings() {
     localStorage.setItem("notifications", newVal);
   }
 
+  function toggleTheme() {
+    const newTheme = theme === "dark" ? "grey" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    onThemeChange(newTheme);
+  }
+
   function handleSave() {
     const steps = Number(goals.steps);
     const water = Number(goals.water);
     const calories = Number(goals.calories);
 
     if (steps < 1000 || steps > 50000) {
-      alert("Step goal must be between 1,000 and 50,000!");
+      setToastMsg("Step goal must be 1,000 – 50,000!");
+      setShowToast(true);
       return;
     }
     if (water < 1 || water > 20) {
-      alert("Water goal must be between 1 and 20 glasses!");
+      setToastMsg("Water goal must be 1 – 20 glasses!");
+      setShowToast(true);
       return;
     }
     if (calories < 100 || calories > 5000) {
-      alert("Calorie goal must be between 100 and 5,000!");
+      setToastMsg("Calorie goal must be 100 – 5,000!");
+      setShowToast(true);
       return;
     }
 
     localStorage.setItem("goal_steps", goals.steps);
     localStorage.setItem("goal_water", goals.water);
     localStorage.setItem("goal_calories", goals.calories);
+    setToastMsg("Goals saved!");
     setShowToast(true);
   }
 
@@ -77,7 +90,7 @@ function Settings() {
   return (
     <div className="page animate">
       <Toast
-        message="Goals saved!"
+        message={toastMsg}
         show={showToast}
         onHide={() => setShowToast(false)}
       />
@@ -88,6 +101,72 @@ function Settings() {
       <h1 style={{ fontSize: "2rem", fontWeight: "800", marginBottom: "24px" }}>
         Settings
       </h1>
+
+      {/* Theme Toggle */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
+          borderRadius: "24px",
+          padding: "22px",
+          marginBottom: "14px",
+          border: "1px solid #2a2a2a",
+        }}
+      >
+        <p
+          style={{
+            fontSize: "0.7rem",
+            color: "#555",
+            textTransform: "uppercase",
+            letterSpacing: "2px",
+            marginBottom: "16px",
+          }}
+        >
+          Appearance
+        </p>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {theme === "dark" ? (
+              <Moon size={20} color="#5e5ce6" />
+            ) : (
+              <Sun size={20} color="#ff9f0a" />
+            )}
+            <span style={{ color: "#ccc", fontSize: "0.95rem" }}>
+              {theme === "dark" ? "Dark Mode" : "Grey Mode"}
+            </span>
+          </div>
+          <div
+            onClick={toggleTheme}
+            style={{
+              width: "50px",
+              height: "28px",
+              borderRadius: "99px",
+              background: theme === "grey" ? "#ff9f0a" : "#5e5ce6",
+              cursor: "pointer",
+              position: "relative",
+              transition: "background 0.3s ease",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "4px",
+                left: theme === "grey" ? "26px" : "4px",
+                width: "20px",
+                height: "20px",
+                borderRadius: "50%",
+                background: "#fff",
+                transition: "left 0.3s ease",
+              }}
+            ></div>
+          </div>
+        </div>
+      </div>
 
       {/* Notifications Toggle */}
       <div
