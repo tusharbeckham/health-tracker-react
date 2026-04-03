@@ -46,18 +46,7 @@ function WaterTracker() {
       </div>
 
       {isGoalDone && (
-        <div
-          style={{
-            background: "rgba(0, 16, 26, 0.6)",
-            border: "1px solid #0a84ff",
-            borderRadius: "14px",
-            padding: "12px 16px",
-            marginBottom: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+        <div className="goal-banner blue">
           <Droplets size={18} color="#0a84ff" />
           <span
             style={{ color: "#0a84ff", fontSize: "0.9rem", fontWeight: "600" }}

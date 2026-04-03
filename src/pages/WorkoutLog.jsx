@@ -124,10 +124,9 @@ function WorkoutLog() {
         {isGoalDone && <CheckCircle size={24} color="#ff9f0a" />}
       </div>
 
-      {/* Progress bar */}
       <div
         style={{
-          background: "var(--input-bg)",
+          background: "var(--surface2)",
           borderRadius: "99px",
           height: "5px",
           marginBottom: "16px",
@@ -149,18 +148,7 @@ function WorkoutLog() {
       </div>
 
       {isGoalDone && (
-        <div
-          style={{
-            background: "#1a1200",
-            border: "1px solid #ff9f0a",
-            borderRadius: "14px",
-            padding: "12px 16px",
-            marginBottom: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+        <div className="goal-banner orange">
           <Flame size={18} color="#ff9f0a" />
           <span
             style={{ color: "#ff9f0a", fontSize: "0.9rem", fontWeight: "600" }}
@@ -170,7 +158,7 @@ function WorkoutLog() {
         </div>
       )}
 
-      {/* Exercise dropdown */}
+      {/* Exercise Dropdown */}
       <div style={{ position: "relative", marginBottom: "10px" }}>
         <div
           onClick={() => setShowDropdown(!showDropdown)}
@@ -205,7 +193,7 @@ function WorkoutLog() {
               zIndex: 50,
               maxHeight: "280px",
               overflow: "hidden",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
             }}
           >
             <div
@@ -226,7 +214,7 @@ function WorkoutLog() {
                     borderRadius: "99px",
                     border: "none",
                     background:
-                      selectedCategory === cat ? "#ff9f0a" : "var(--input-bg)",
+                      selectedCategory === cat ? "#ff9f0a" : "var(--surface2)",
                     color: selectedCategory === cat ? "#000" : "var(--muted)",
                     fontSize: "0.75rem",
                     fontWeight: "600",
@@ -339,14 +327,14 @@ function WorkoutLog() {
           <div
             key={i}
             style={{
-              background: "var(--input-bg)",
+              background: "var(--surface2)",
               padding: "12px 16px",
               borderRadius: "14px",
               marginBottom: "8px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              border: "1px solid var(--input-border)",
+              border: "1px solid var(--border)",
             }}
           >
             <div>

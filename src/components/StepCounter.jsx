@@ -6,7 +6,6 @@ function StepCounter() {
     () => Number(localStorage.getItem("steps")) || 0,
   );
   const goal = Number(localStorage.getItem("goal_steps")) || 10000;
-
   const kms = (steps * 0.000762).toFixed(2);
   const calories = Math.round(steps * 0.04);
 
@@ -14,29 +13,23 @@ function StepCounter() {
   const lastStepRef = useRef(0);
   const stepBufferRef = useRef([]);
 
-  // Save derived values to localStorage
   useEffect(() => {
     localStorage.setItem("kms", kms);
     localStorage.setItem("stepCalories", calories);
   }, [steps, kms, calories]);
 
-  // Device Motion Logic
   useEffect(() => {
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
       if (!acc) return;
-
       const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
       stepBufferRef.current.push(magnitude);
-
       if (stepBufferRef.current.length > 6) stepBufferRef.current.shift();
-
       const avg =
         stepBufferRef.current.reduce((a, b) => a + b, 0) /
         stepBufferRef.current.length;
       const delta = Math.abs(avg - lastAccRef.current);
       const now = Date.now();
-
       if (delta > 2.8 && delta < 18 && now - lastStepRef.current > 450) {
         lastStepRef.current = now;
         setSteps((prev) => {
@@ -57,8 +50,8 @@ function StepCounter() {
       typeof DeviceMotionEvent.requestPermission === "function"
     ) {
       DeviceMotionEvent.requestPermission()
-        .then((response) => {
-          if (response === "granted") startMotion();
+        .then((r) => {
+          if (r === "granted") startMotion();
         })
         .catch(() => startMotion());
     } else {
@@ -125,7 +118,6 @@ function StepCounter() {
             {kms} km
           </p>
         </div>
-
         <div
           style={{
             background: "var(--surface2)",
@@ -154,18 +146,7 @@ function StepCounter() {
       </div>
 
       {isGoalDone && (
-        <div
-          style={{
-            background: "rgba(0, 26, 10, 0.6)",
-            border: "1px solid #30d158",
-            borderRadius: "14px",
-            padding: "12px 16px",
-            marginBottom: "14px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+        <div className="goal-banner green">
           <Footprints size={18} color="#30d158" />
           <span
             style={{ color: "#30d158", fontSize: "0.9rem", fontWeight: "600" }}

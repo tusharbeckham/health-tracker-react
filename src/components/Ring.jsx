@@ -19,7 +19,7 @@ function Ring({ percent, color, size = 80, stroke = 8, label, value }) {
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="#1a1a1a"
+            stroke="var(--ring-bg)"
             strokeWidth={stroke}
           />
           <circle
@@ -44,20 +44,26 @@ function Ring({ percent, color, size = 80, stroke = 8, label, value }) {
             justifyContent: "center",
             fontSize: "0.75rem",
             fontWeight: "700",
-            color: "#fff",
+            color: "var(--ring-text)",
           }}
         >
           {Math.round(percent)}%
         </div>
       </div>
       <div style={{ textAlign: "center" }}>
-        <p style={{ fontSize: "0.75rem", fontWeight: "700", color: "#fff" }}>
+        <p
+          style={{
+            fontSize: "0.75rem",
+            fontWeight: "700",
+            color: "var(--text)",
+          }}
+        >
           {value}
         </p>
         <p
           style={{
             fontSize: "0.6rem",
-            color: "#555",
+            color: "var(--muted)",
             textTransform: "uppercase",
             letterSpacing: "1px",
           }}

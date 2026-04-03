@@ -64,7 +64,12 @@ function StreakCard() {
                     : "none",
                 }}
               />
-              <span style={{ fontSize: "0.65rem", color: "var(--muted)" }}>
+              <span
+                style={{
+                  fontSize: "0.65rem",
+                  color: isActive ? "#ff9f0a" : "var(--muted)",
+                }}
+              >
                 {day}
               </span>
             </div>
