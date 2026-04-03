@@ -8,9 +8,11 @@ function Settings({ onThemeChange }) {
     water: localStorage.getItem("goal_water") || "8",
     calories: localStorage.getItem("goal_calories") || "500",
   });
+
   const [notifications, setNotifications] = useState(
     localStorage.getItem("notifications") === "true" || false,
   );
+
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "dark");
   const [showToast, setShowToast] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
@@ -22,11 +24,11 @@ function Settings({ onThemeChange }) {
   function toggleNotifications() {
     const newVal = !notifications;
     setNotifications(newVal);
-    localStorage.setItem("notifications", newVal);
+    localStorage.setItem("notifications", newVal.toString());
   }
 
   function toggleTheme() {
-    const newTheme = theme === "dark" ? "grey" : "dark";
+    const newTheme = theme === "dark" ? "light" : "dark"; // Changed "grey" to "light"
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
     onThemeChange(newTheme);
@@ -56,7 +58,8 @@ function Settings({ onThemeChange }) {
     localStorage.setItem("goal_steps", goals.steps);
     localStorage.setItem("goal_water", goals.water);
     localStorage.setItem("goal_calories", goals.calories);
-    setToastMsg("Goals saved!");
+
+    setToastMsg("Goals saved successfully!");
     setShowToast(true);
   }
 
@@ -64,15 +67,15 @@ function Settings({ onThemeChange }) {
     {
       label: "Step Goal",
       name: "steps",
-      icon: <Target size={16} color="#30d158" />,
+      icon: <Target size={18} color="#30d158" />,
       min: 1000,
       max: 50000,
-      hint: "1,000 – 50,000",
+      hint: "1,000 – 50,000 steps",
     },
     {
       label: "Water Goal (glasses)",
       name: "water",
-      icon: <Droplets size={16} color="#0a84ff" />,
+      icon: <Droplets size={18} color="#0a84ff" />,
       min: 1,
       max: 20,
       hint: "1 – 20 glasses",
@@ -80,10 +83,10 @@ function Settings({ onThemeChange }) {
     {
       label: "Calorie Burn Goal",
       name: "calories",
-      icon: <Flame size={16} color="#ff9f0a" />,
+      icon: <Flame size={18} color="#ff9f0a" />,
       min: 100,
       max: 5000,
-      hint: "100 – 5,000 cal",
+      hint: "100 – 5,000 calories",
     },
   ];
 
@@ -95,34 +98,14 @@ function Settings({ onThemeChange }) {
         onHide={() => setShowToast(false)}
       />
 
-      <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
-        Preferences
-      </p>
-      <h1 style={{ fontSize: "2rem", fontWeight: "800", marginBottom: "24px" }}>
+      <p className="card-label">Preferences</p>
+      <h1 style={{ fontSize: "2rem", fontWeight: "800", marginBottom: "28px" }}>
         Settings
       </h1>
 
       {/* Theme Toggle */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-          borderRadius: "24px",
-          padding: "22px",
-          marginBottom: "14px",
-          border: "1px solid #2a2a2a",
-        }}
-      >
-        <p
-          style={{
-            fontSize: "0.7rem",
-            color: "#555",
-            textTransform: "uppercase",
-            letterSpacing: "2px",
-            marginBottom: "16px",
-          }}
-        >
-          Appearance
-        </p>
+      <div className="card">
+        <p className="card-label">Appearance</p>
         <div
           style={{
             display: "flex",
@@ -130,23 +113,24 @@ function Settings({ onThemeChange }) {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             {theme === "dark" ? (
-              <Moon size={20} color="#5e5ce6" />
+              <Moon size={22} color="#5e5ce6" />
             ) : (
-              <Sun size={20} color="#ff9f0a" />
+              <Sun size={22} color="#ff9f0a" />
             )}
-            <span style={{ color: "#ccc", fontSize: "0.95rem" }}>
-              {theme === "dark" ? "Dark Mode" : "Grey Mode"}
+            <span style={{ fontSize: "1rem", color: "var(--text)" }}>
+              {theme === "dark" ? "Dark Mode" : "Light Mode"}
             </span>
           </div>
+
           <div
             onClick={toggleTheme}
             style={{
-              width: "50px",
-              height: "28px",
-              borderRadius: "99px",
-              background: theme === "grey" ? "#ff9f0a" : "#5e5ce6",
+              width: "52px",
+              height: "30px",
+              borderRadius: "999px",
+              background: theme === "dark" ? "#5e5ce6" : "#ff9f0a",
               cursor: "pointer",
               position: "relative",
               transition: "background 0.3s ease",
@@ -155,40 +139,23 @@ function Settings({ onThemeChange }) {
             <div
               style={{
                 position: "absolute",
-                top: "4px",
-                left: theme === "grey" ? "26px" : "4px",
-                width: "20px",
-                height: "20px",
+                top: "3px",
+                left: theme === "dark" ? "4px" : "26px",
+                width: "24px",
+                height: "24px",
                 borderRadius: "50%",
-                background: "#fff",
+                background: "#ffffff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                 transition: "left 0.3s ease",
               }}
-            ></div>
+            />
           </div>
         </div>
       </div>
 
       {/* Notifications Toggle */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-          borderRadius: "24px",
-          padding: "22px",
-          marginBottom: "14px",
-          border: "1px solid #2a2a2a",
-        }}
-      >
-        <p
-          style={{
-            fontSize: "0.7rem",
-            color: "#555",
-            textTransform: "uppercase",
-            letterSpacing: "2px",
-            marginBottom: "16px",
-          }}
-        >
-          Notifications
-        </p>
+      <div className="card">
+        <p className="card-label">Notifications</p>
         <div
           style={{
             display: "flex",
@@ -196,19 +163,23 @@ function Settings({ onThemeChange }) {
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <Bell size={20} color={notifications ? "#30d158" : "#555"} />
-            <span style={{ color: "#ccc", fontSize: "0.95rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <Bell
+              size={22}
+              color={notifications ? "#30d158" : "var(--muted)"}
+            />
+            <span style={{ fontSize: "1rem", color: "var(--text)" }}>
               Daily Reminders
             </span>
           </div>
+
           <div
             onClick={toggleNotifications}
             style={{
-              width: "50px",
-              height: "28px",
-              borderRadius: "99px",
-              background: notifications ? "#30d158" : "#2c2c2e",
+              width: "52px",
+              height: "30px",
+              borderRadius: "999px",
+              background: notifications ? "#30d158" : "var(--input-border)",
               cursor: "pointer",
               position: "relative",
               transition: "background 0.3s ease",
@@ -217,54 +188,46 @@ function Settings({ onThemeChange }) {
             <div
               style={{
                 position: "absolute",
-                top: "4px",
+                top: "3px",
                 left: notifications ? "26px" : "4px",
-                width: "20px",
-                height: "20px",
+                width: "24px",
+                height: "24px",
                 borderRadius: "50%",
-                background: "#fff",
+                background: "#ffffff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
                 transition: "left 0.3s ease",
               }}
-            ></div>
+            />
           </div>
         </div>
       </div>
 
-      {/* Goals */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-          borderRadius: "24px",
-          padding: "22px",
-          marginBottom: "14px",
-          border: "1px solid #2a2a2a",
-        }}
-      >
-        <p
-          style={{
-            fontSize: "0.7rem",
-            color: "#555",
-            textTransform: "uppercase",
-            letterSpacing: "2px",
-            marginBottom: "16px",
-          }}
-        >
-          Daily Goals
-        </p>
+      {/* Daily Goals */}
+      <div className="card">
+        <p className="card-label">Daily Goals</p>
 
         {fields.map((field) => (
-          <div key={field.name} style={{ marginBottom: "16px" }}>
+          <div key={field.name} style={{ marginBottom: "20px" }}>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
-                marginBottom: "6px",
+                gap: "8px",
+                marginBottom: "8px",
               }}
             >
               {field.icon}
-              <p style={{ fontSize: "0.8rem", color: "#888" }}>{field.label}</p>
+              <p
+                style={{
+                  fontSize: "0.95rem",
+                  color: "var(--text2)",
+                  margin: 0,
+                }}
+              >
+                {field.label}
+              </p>
             </div>
+
             <input
               type="number"
               name={field.name}
@@ -272,18 +235,16 @@ function Settings({ onThemeChange }) {
               onChange={handleChange}
               min={field.min}
               max={field.max}
-              style={{
-                width: "100%",
-                padding: "13px 16px",
-                background: "#111",
-                border: "1px solid #222",
-                borderRadius: "14px",
-                color: "#fff",
-                fontSize: "1rem",
-                outline: "none",
-              }}
+              className="input"
             />
-            <p style={{ fontSize: "0.7rem", color: "#444", marginTop: "4px" }}>
+
+            <p
+              style={{
+                fontSize: "0.75rem",
+                color: "var(--muted)",
+                marginTop: "6px",
+              }}
+            >
               {field.hint}
             </p>
           </div>
@@ -291,18 +252,15 @@ function Settings({ onThemeChange }) {
 
         <button
           onClick={handleSave}
+          className="input"
           style={{
-            width: "100%",
-            padding: "14px",
             background: "linear-gradient(135deg, #0a84ff, #0066cc)",
-            border: "none",
-            borderRadius: "14px",
             color: "#fff",
-            fontSize: "1rem",
             fontWeight: "700",
+            fontSize: "1.05rem",
+            marginTop: "12px",
+            border: "none",
             cursor: "pointer",
-            boxShadow: "0 4px 20px rgba(10, 132, 255, 0.3)",
-            marginTop: "8px",
           }}
         >
           Save Goals
