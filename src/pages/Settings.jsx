@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Target, Droplets, Flame, Bell } from "lucide-react";
+import Toast from "../components/Toast";
 
 function Settings() {
   const [goals, setGoals] = useState({
@@ -7,10 +8,10 @@ function Settings() {
     water: localStorage.getItem("goal_water") || "8",
     calories: localStorage.getItem("goal_calories") || "500",
   });
-
   const [notifications, setNotifications] = useState(
     localStorage.getItem("notifications") === "true" || false,
   );
+  const [showToast, setShowToast] = useState(false);
 
   function handleChange(e) {
     setGoals({ ...goals, [e.target.name]: e.target.value });
@@ -43,7 +44,7 @@ function Settings() {
     localStorage.setItem("goal_steps", goals.steps);
     localStorage.setItem("goal_water", goals.water);
     localStorage.setItem("goal_calories", goals.calories);
-    alert("Goals saved!");
+    setShowToast(true);
   }
 
   const fields = [
@@ -75,6 +76,12 @@ function Settings() {
 
   return (
     <div className="page animate">
+      <Toast
+        message="Goals saved!"
+        show={showToast}
+        onHide={() => setShowToast(false)}
+      />
+
       <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
         Preferences
       </p>

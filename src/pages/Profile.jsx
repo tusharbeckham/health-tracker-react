@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Toast from "../components/Toast";
 
 function Profile() {
   const [form, setForm] = useState({
@@ -7,6 +8,7 @@ function Profile() {
     weight: localStorage.getItem("profile_weight") || "",
     height: localStorage.getItem("profile_height") || "",
   });
+  const [showToast, setShowToast] = useState(false);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,11 +19,17 @@ function Profile() {
     localStorage.setItem("profile_age", form.age);
     localStorage.setItem("profile_weight", form.weight);
     localStorage.setItem("profile_height", form.height);
-    alert("Profile saved!");
+    setShowToast(true);
   }
 
   return (
     <div className="page animate">
+      <Toast
+        message="Profile saved!"
+        show={showToast}
+        onHide={() => setShowToast(false)}
+      />
+
       <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
         Your Info
       </p>
@@ -115,6 +123,7 @@ function Profile() {
             fontWeight: "700",
             cursor: "pointer",
             boxShadow: "0 4px 20px rgba(48, 209, 88, 0.3)",
+            marginTop: "8px",
           }}
         >
           Save Profile

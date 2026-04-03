@@ -12,6 +12,12 @@ function App() {
     const savedDate = localStorage.getItem("savedDate");
     const todayDate = new Date().toLocaleDateString();
 
+    // Pehli baar open kiya — date set karo
+    if (!savedDate) {
+      localStorage.setItem("savedDate", todayDate);
+      return;
+    }
+
     if (savedDate !== todayDate) {
       // Aaj ka data weekly history mein save karo
       const dayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
@@ -45,7 +51,7 @@ function App() {
       let streak = Number(localStorage.getItem("streak")) || 0;
       if (lastDate === yesterdayDate) {
         streak = streak + 1;
-      } else if (lastDate !== todayDate) {
+      } else {
         streak = 1;
       }
 
