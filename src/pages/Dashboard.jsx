@@ -1,8 +1,8 @@
 import StepCounter from "../components/StepCounter";
-import WaterTracker from "../components/WaterTracker"; // ← yeh sahi path hona chahiye
+import WaterTracker from "../pages/WaterTracker";
 import WorkoutLog from "../pages/WorkoutLog";
-import StreakCard from "../components/StreakCard"; // agar components folder mein hai
-import WeeklyStats from "../components/WeeklyStats";
+import StreakCard from "../pages/StreakCard";
+import WeeklyStats from "../pages/WeeklyStats";
 import NotificationBanner from "../components/NotificationBanner";
 import { Sun, Moon, Sunset } from "lucide-react";
 
