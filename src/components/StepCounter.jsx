@@ -2,10 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { Footprints, Trophy } from "lucide-react";
 
 function StepCounter() {
-  const [steps, setSteps] = useState(
-    () => Number(localStorage.getItem("steps")) || 0,
-  );
+  const [steps, setSteps] = useState(0);
   const goal = Number(localStorage.getItem("goal_steps")) || 10000;
+
   const kms = (steps * 0.000762).toFixed(2);
   const calories = Math.round(steps * 0.04);
 
@@ -13,52 +12,87 @@ function StepCounter() {
   const lastStepRef = useRef(0);
   const stepBufferRef = useRef([]);
 
+  // ==================== DAILY RESET LOGIC ====================
+  useEffect(() => {
+    const resetIfNewDay = () => {
+      const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+      const savedDate = localStorage.getItem("steps_date");
+      const savedSteps = Number(localStorage.getItem("steps")) || 0;
+
+      if (savedDate !== today) {
+        // New day detected → Reset steps
+        localStorage.setItem("steps", "0");
+        localStorage.setItem("steps_date", today);
+        setSteps(0);
+      } else {
+        // Same day → Load previous steps
+        setSteps(savedSteps);
+      }
+    };
+
+    resetIfNewDay();
+  }, []);
+
+  // Save steps whenever it changes + update date
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    localStorage.setItem("steps", steps.toString());
+    localStorage.setItem("steps_date", today);
+  }, [steps]);
+
+  // Save kms and calories
   useEffect(() => {
     localStorage.setItem("kms", kms);
     localStorage.setItem("stepCalories", calories);
-  }, [steps, kms, calories]);
+  }, [kms, calories]);
 
+  // ==================== STEP DETECTION ====================
   useEffect(() => {
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
       if (!acc) return;
+
       const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+
       stepBufferRef.current.push(magnitude);
       if (stepBufferRef.current.length > 6) stepBufferRef.current.shift();
+
       const avg =
         stepBufferRef.current.reduce((a, b) => a + b, 0) /
         stepBufferRef.current.length;
+
       const delta = Math.abs(avg - lastAccRef.current);
       const now = Date.now();
+
       if (delta > 2.8 && delta < 18 && now - lastStepRef.current > 450) {
         lastStepRef.current = now;
-        setSteps((prev) => {
-          const newSteps = prev + 1;
-          localStorage.setItem("steps", newSteps);
-          return newSteps;
-        });
+        setSteps((prev) => prev + 1);
       }
+
       lastAccRef.current = avg;
     }
 
-    function startMotion() {
+    const startMotion = () => {
       window.addEventListener("devicemotion", handleMotion);
-    }
+    };
 
     if (
       typeof DeviceMotionEvent !== "undefined" &&
       typeof DeviceMotionEvent.requestPermission === "function"
     ) {
       DeviceMotionEvent.requestPermission()
-        .then((r) => {
-          if (r === "granted") startMotion();
+        .then((permission) => {
+          if (permission === "granted") startMotion();
         })
         .catch(() => startMotion());
     } else {
       startMotion();
     }
 
-    return () => window.removeEventListener("devicemotion", handleMotion);
+    return () => {
+      window.removeEventListener("devicemotion", handleMotion);
+    };
   }, []);
 
   const percent = Math.min((steps / goal) * 100, 100);
@@ -118,6 +152,7 @@ function StepCounter() {
             {kms} km
           </p>
         </div>
+
         <div
           style={{
             background: "var(--surface2)",
@@ -167,7 +202,7 @@ function StepCounter() {
       >
         <div
           style={{
-            width: percent + "%",
+            width: `${percent}%`,
             height: "100%",
             background: isGoalDone
               ? "#30d158"
