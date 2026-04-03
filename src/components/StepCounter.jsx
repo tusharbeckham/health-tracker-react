@@ -5,7 +5,6 @@ function StepCounter() {
   const [steps, setSteps] = useState(
     () => Number(localStorage.getItem("steps")) || 0,
   );
-
   const goal = Number(localStorage.getItem("goal_steps")) || 10000;
 
   const kms = (steps * 0.000762).toFixed(2);
@@ -15,19 +14,21 @@ function StepCounter() {
   const lastStepRef = useRef(0);
   const stepBufferRef = useRef([]);
 
+  // Save derived values to localStorage
   useEffect(() => {
     localStorage.setItem("kms", kms);
     localStorage.setItem("stepCalories", calories);
   }, [steps, kms, calories]);
 
+  // Device Motion Logic
   useEffect(() => {
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
       if (!acc) return;
 
       const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
-
       stepBufferRef.current.push(magnitude);
+
       if (stepBufferRef.current.length > 6) stepBufferRef.current.shift();
 
       const avg =
@@ -44,7 +45,6 @@ function StepCounter() {
           return newSteps;
         });
       }
-
       lastAccRef.current = avg;
     }
 
@@ -72,26 +72,8 @@ function StepCounter() {
   const isGoalDone = steps >= goal;
 
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-        borderRadius: "24px",
-        padding: "22px",
-        marginBottom: "14px",
-        border: "1px solid #2a2a2a",
-      }}
-    >
-      <p
-        style={{
-          fontSize: "0.7rem",
-          color: "#555",
-          textTransform: "uppercase",
-          letterSpacing: "2px",
-          marginBottom: "6px",
-        }}
-      >
-        Steps Today
-      </p>
+    <div className="card">
+      <p className="card-label">Steps Today</p>
 
       <div
         style={{
@@ -105,13 +87,13 @@ function StepCounter() {
           style={{
             fontSize: "3rem",
             fontWeight: "800",
-            color: isGoalDone ? "#30d158" : "#fff",
+            color: isGoalDone ? "#30d158" : "var(--text)",
             lineHeight: 1,
           }}
         >
           {steps.toLocaleString()}
         </span>
-        <span style={{ fontSize: "1rem", color: "#444" }}>
+        <span style={{ fontSize: "1rem", color: "var(--muted)" }}>
           / {goal.toLocaleString()}
         </span>
         {isGoalDone && <Trophy size={24} color="#30d158" />}
@@ -120,17 +102,17 @@ function StepCounter() {
       <div style={{ display: "flex", gap: "12px", marginBottom: "14px" }}>
         <div
           style={{
-            background: "#111",
+            background: "var(--surface2)",
             borderRadius: "12px",
             padding: "10px 14px",
             flex: 1,
-            border: "1px solid #222",
+            border: "1px solid var(--border)",
           }}
         >
           <p
             style={{
               fontSize: "0.65rem",
-              color: "#555",
+              color: "var(--muted)",
               textTransform: "uppercase",
               letterSpacing: "1px",
             }}
@@ -143,19 +125,20 @@ function StepCounter() {
             {kms} km
           </p>
         </div>
+
         <div
           style={{
-            background: "#111",
+            background: "var(--surface2)",
             borderRadius: "12px",
             padding: "10px 14px",
             flex: 1,
-            border: "1px solid #222",
+            border: "1px solid var(--border)",
           }}
         >
           <p
             style={{
               fontSize: "0.65rem",
-              color: "#555",
+              color: "var(--muted)",
               textTransform: "uppercase",
               letterSpacing: "1px",
             }}
@@ -173,7 +156,7 @@ function StepCounter() {
       {isGoalDone && (
         <div
           style={{
-            background: "#001a0a",
+            background: "rgba(0, 26, 10, 0.6)",
             border: "1px solid #30d158",
             borderRadius: "14px",
             padding: "12px 16px",
@@ -194,9 +177,9 @@ function StepCounter() {
 
       <div
         style={{
-          background: "#111",
+          background: "var(--surface2)",
           borderRadius: "99px",
-          height: "5px",
+          height: "6px",
           marginBottom: "8px",
           overflow: "hidden",
         }}
@@ -210,12 +193,17 @@ function StepCounter() {
               : "linear-gradient(90deg, #30d158, #00ff88)",
             borderRadius: "99px",
             transition: "width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
-            boxShadow: "0 0 10px rgba(48, 209, 88, 0.5)",
           }}
-        ></div>
+        />
       </div>
 
-      <p style={{ fontSize: "0.75rem", color: "#555", textAlign: "right" }}>
+      <p
+        style={{
+          fontSize: "0.75rem",
+          color: "var(--muted)",
+          textAlign: "right",
+        }}
+      >
         {Math.round(percent)}% of daily goal
       </p>
     </div>

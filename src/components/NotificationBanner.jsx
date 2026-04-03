@@ -2,7 +2,6 @@ import { Sunrise, Droplets, Dumbbell, Heart } from "lucide-react";
 
 function NotificationBanner() {
   const hour = new Date().getHours();
-
   let message = "Stay consistent today!";
   let Icon = Heart;
   let color = "#30d158";
@@ -24,7 +23,7 @@ function NotificationBanner() {
   return (
     <div
       style={{
-        background: "#1c1c1e",
+        background: "var(--surface)",
         borderRadius: "16px",
         padding: "14px 16px",
         marginBottom: "12px",
@@ -34,10 +33,12 @@ function NotificationBanner() {
         gap: "10px",
         fontSize: "0.9rem",
         fontWeight: "500",
+        color: "var(--text)",
+        border: "1px solid var(--border)",
       }}
     >
       <Icon size={20} color={color} />
-      <span style={{ color: "#ccc" }}>{message}</span>
+      <span>{message}</span>
     </div>
   );
 }

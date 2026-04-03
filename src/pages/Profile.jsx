@@ -8,6 +8,7 @@ function Profile() {
     weight: localStorage.getItem("profile_weight") || "",
     height: localStorage.getItem("profile_height") || "",
   });
+
   const [showToast, setShowToast] = useState(false);
 
   function handleChange(e) {
@@ -25,38 +26,18 @@ function Profile() {
   return (
     <div className="page animate">
       <Toast
-        message="Profile saved!"
+        message="Profile saved successfully!"
         show={showToast}
         onHide={() => setShowToast(false)}
       />
 
-      <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
-        Your Info
-      </p>
+      <p className="card-label">Your Info</p>
       <h1 style={{ fontSize: "2rem", fontWeight: "800", marginBottom: "24px" }}>
         Profile
       </h1>
 
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-          borderRadius: "24px",
-          padding: "22px",
-          marginBottom: "14px",
-          border: "1px solid #2a2a2a",
-        }}
-      >
-        <p
-          style={{
-            fontSize: "0.7rem",
-            color: "#555",
-            textTransform: "uppercase",
-            letterSpacing: "2px",
-            marginBottom: "16px",
-          }}
-        >
-          Personal Details
-        </p>
+      <div className="card">
+        <p className="card-label">Personal Details</p>
 
         {[
           {
@@ -84,9 +65,13 @@ function Profile() {
             type: "number",
           },
         ].map((field) => (
-          <div key={field.label} style={{ marginBottom: "14px" }}>
+          <div key={field.name} style={{ marginBottom: "16px" }}>
             <p
-              style={{ fontSize: "0.8rem", color: "#888", marginBottom: "6px" }}
+              style={{
+                fontSize: "0.85rem",
+                color: "var(--text2)",
+                marginBottom: "6px",
+              }}
             >
               {field.label}
             </p>
@@ -96,16 +81,7 @@ function Profile() {
               placeholder={field.placeholder}
               value={form[field.name]}
               onChange={handleChange}
-              style={{
-                width: "100%",
-                padding: "13px 16px",
-                background: "#111",
-                border: "1px solid #222",
-                borderRadius: "14px",
-                color: "#fff",
-                fontSize: "1rem",
-                outline: "none",
-              }}
+              className="input"
             />
           </div>
         ))}
@@ -122,7 +98,6 @@ function Profile() {
             fontSize: "1rem",
             fontWeight: "700",
             cursor: "pointer",
-            boxShadow: "0 4px 20px rgba(48, 209, 88, 0.3)",
             marginTop: "8px",
           }}
         >

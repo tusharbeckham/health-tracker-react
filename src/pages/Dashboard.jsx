@@ -1,8 +1,8 @@
 import StepCounter from "../components/StepCounter";
-import WaterTracker from "../pages/WaterTracker";
+import WaterTracker from "../components/WaterTracker"; // ← yeh sahi path hona chahiye
 import WorkoutLog from "../pages/WorkoutLog";
-import StreakCard from "../pages/StreakCard";
-import WeeklyStats from "../pages/WeeklyStats";
+import StreakCard from "../components/StreakCard"; // agar components folder mein hai
+import WeeklyStats from "../components/WeeklyStats";
 import NotificationBanner from "../components/NotificationBanner";
 import { Sun, Moon, Sunset } from "lucide-react";
 
@@ -31,7 +31,13 @@ function Dashboard() {
   return (
     <div className="page">
       <div style={{ marginBottom: "24px" }}>
-        <p style={{ color: "#555", fontSize: "0.85rem", marginBottom: "4px" }}>
+        <p
+          style={{
+            color: "var(--muted)",
+            fontSize: "0.85rem",
+            marginBottom: "4px",
+          }}
+        >
           {today}
         </p>
         <h1
@@ -41,6 +47,7 @@ function Dashboard() {
             display: "flex",
             alignItems: "center",
             gap: "10px",
+            color: "var(--text)",
           }}
         >
           {greeting} <GreetIcon size={28} color={iconColor} />
@@ -52,19 +59,15 @@ function Dashboard() {
       <div className="animate">
         <StepCounter />
       </div>
-
       <div className="animate delay-1">
         <WaterTracker />
       </div>
-
       <div className="animate delay-2">
         <WorkoutLog />
       </div>
-
       <div className="animate delay-3">
         <StreakCard />
       </div>
-
       <div className="animate delay-3">
         <WeeklyStats />
       </div>

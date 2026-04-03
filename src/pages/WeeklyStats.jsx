@@ -1,6 +1,6 @@
 import { useState } from "react";
-import Ring from "../components/Ring";
 import { X, Footprints, Droplets, Flame, MapPin } from "lucide-react";
+import Ring from "../components/Ring";
 
 function WeeklyStats() {
   const [selectedDay, setSelectedDay] = useState(null);
@@ -25,34 +25,12 @@ function WeeklyStats() {
   );
   const totalKms = days.reduce((sum, d) => sum + (weeklyData[d]?.kms || 0), 0);
 
-  const weeklyStepGoal = stepGoal * 7;
-  const weeklyWaterGoal = waterGoal * 7;
-  const weeklyCalGoal = calGoal * 7;
-
   const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 
   return (
     <>
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-          borderRadius: "24px",
-          padding: "22px",
-          marginBottom: "14px",
-          border: "1px solid #2a2a2a",
-        }}
-      >
-        <p
-          style={{
-            fontSize: "0.7rem",
-            color: "#555",
-            textTransform: "uppercase",
-            letterSpacing: "2px",
-            marginBottom: "16px",
-          }}
-        >
-          Weekly Summary
-        </p>
+      <div className="card">
+        <p className="card-label">Weekly Summary</p>
 
         {/* Rings */}
         <div
@@ -63,7 +41,7 @@ function WeeklyStats() {
           }}
         >
           <Ring
-            percent={Math.min((totalSteps / weeklyStepGoal) * 100, 100)}
+            percent={Math.min((totalSteps / (stepGoal * 7)) * 100, 100)}
             color="#30d158"
             size={75}
             stroke={7}
@@ -82,7 +60,7 @@ function WeeklyStats() {
             value={totalKms.toFixed(1) + " km"}
           />
           <Ring
-            percent={Math.min((totalWater / weeklyWaterGoal) * 100, 100)}
+            percent={Math.min((totalWater / (waterGoal * 7)) * 100, 100)}
             color="#5e5ce6"
             size={75}
             stroke={7}
@@ -90,7 +68,7 @@ function WeeklyStats() {
             value={totalWater + " gl"}
           />
           <Ring
-            percent={Math.min((totalCals / weeklyCalGoal) * 100, 100)}
+            percent={Math.min((totalCals / (calGoal * 7)) * 100, 100)}
             color="#ff9f0a"
             size={75}
             stroke={7}
@@ -99,18 +77,10 @@ function WeeklyStats() {
           />
         </div>
 
-        {/* Daily bars */}
-        <p
-          style={{
-            fontSize: "0.7rem",
-            color: "#555",
-            textTransform: "uppercase",
-            letterSpacing: "2px",
-            marginBottom: "12px",
-          }}
-        >
+        <p className="card-label" style={{ marginBottom: "12px" }}>
           Tap a day for details
         </p>
+
         <div
           style={{
             display: "flex",
@@ -146,19 +116,18 @@ function WeeklyStats() {
                       ? "#30d158"
                       : hasData
                         ? "#25a244"
-                        : "#2a2a2a",
+                        : "var(--surface2)",
                     borderRadius: "6px",
                     boxShadow: isToday
                       ? "0 0 10px rgba(48,209,88,0.4)"
                       : "none",
-                    transition: "height 0.4s ease, opacity 0.2s",
                     opacity: hasData || isToday ? 1 : 0.4,
                   }}
-                ></div>
+                />
                 <span
                   style={{
-                    fontSize: "0.6rem",
-                    color: isToday ? "#30d158" : "#444",
+                    fontSize: "0.65rem",
+                    color: isToday ? "#30d158" : "var(--muted)",
                   }}
                 >
                   {day}
@@ -187,7 +156,7 @@ function WeeklyStats() {
               <button
                 onClick={() => setSelectedDay(null)}
                 style={{
-                  background: "#2a2a2a",
+                  background: "var(--surface2)",
                   border: "none",
                   borderRadius: "50%",
                   width: "32px",
@@ -195,10 +164,9 @@ function WeeklyStats() {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  cursor: "pointer",
                 }}
               >
-                <X size={16} color="#fff" />
+                <X size={16} color="var(--text)" />
               </button>
             </div>
 
@@ -234,18 +202,18 @@ function WeeklyStats() {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  background: "#111",
+                  background: "var(--surface2)",
                   borderRadius: "14px",
                   padding: "14px 16px",
                   marginBottom: "10px",
-                  border: "1px solid #222",
+                  border: "1px solid var(--border)",
                 }}
               >
                 <div
                   style={{ display: "flex", alignItems: "center", gap: "10px" }}
                 >
                   {item.icon}
-                  <span style={{ color: "#888", fontSize: "0.9rem" }}>
+                  <span style={{ color: "var(--muted)", fontSize: "0.9rem" }}>
                     {item.label}
                   </span>
                 </div>

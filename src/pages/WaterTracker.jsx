@@ -15,27 +15,12 @@ function WaterTracker() {
     }
   }
 
+  const isGoalDone = water >= goal;
+
   return (
-    <div
-      style={{
-        background: "linear-gradient(135deg, #1a1a1a, #1c1c1e)",
-        borderRadius: "24px",
-        padding: "22px",
-        marginBottom: "14px",
-        border: "1px solid #2a2a2a",
-      }}
-    >
-      <p
-        style={{
-          fontSize: "0.7rem",
-          color: "#555",
-          textTransform: "uppercase",
-          letterSpacing: "2px",
-          marginBottom: "6px",
-        }}
-      >
-        Water Intake
-      </p>
+    <div className="card">
+      <p className="card-label">Water Intake</p>
+
       <div
         style={{
           display: "flex",
@@ -48,22 +33,22 @@ function WaterTracker() {
           style={{
             fontSize: "3rem",
             fontWeight: "800",
-            color: water >= goal ? "#0a84ff" : "#fff",
+            color: isGoalDone ? "#0a84ff" : "var(--text)",
             lineHeight: 1,
           }}
         >
           {water}
         </span>
-        <span style={{ fontSize: "1rem", color: "#444" }}>
+        <span style={{ fontSize: "1rem", color: "var(--muted)" }}>
           / {goal} glasses
         </span>
-        {water >= goal && <CheckCircle size={24} color="#0a84ff" />}
+        {isGoalDone && <CheckCircle size={24} color="#0a84ff" />}
       </div>
 
-      {water >= goal && (
+      {isGoalDone && (
         <div
           style={{
-            background: "#00101a",
+            background: "rgba(0, 16, 26, 0.6)",
             border: "1px solid #0a84ff",
             borderRadius: "14px",
             padding: "12px 16px",
@@ -90,13 +75,13 @@ function WaterTracker() {
               flex: 1,
               height: "6px",
               borderRadius: "99px",
-              background: i < water ? "#0a84ff" : "#111",
+              background: i < water ? "#0a84ff" : "var(--surface2)",
               transition: "background 0.3s ease",
-              boxShadow: i < water ? "0 0 8px rgba(10, 132, 255, 0.5)" : "none",
             }}
-          ></div>
+          />
         ))}
       </div>
+
       <button
         onClick={addGlass}
         style={{
@@ -109,7 +94,6 @@ function WaterTracker() {
           fontSize: "1rem",
           fontWeight: "700",
           cursor: "pointer",
-          boxShadow: "0 4px 20px rgba(10, 132, 255, 0.3)",
         }}
       >
         <div
