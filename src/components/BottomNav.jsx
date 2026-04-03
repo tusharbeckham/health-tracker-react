@@ -1,29 +1,26 @@
 import { Home, User, Settings } from "lucide-react";
+import React from "react"; // ← Yeh add karo
 
 function BottomNav({ activePage, setActivePage }) {
+  const tabs = [
+    { id: "home", label: "Home", Icon: Home },
+    { id: "profile", label: "Profile", Icon: User },
+    { id: "settings", label: "Settings", Icon: Settings },
+  ];
+
   return (
     <nav>
-      <button
-        className={activePage === "home" ? "active" : ""}
-        onClick={() => setActivePage("home")}
-      >
-        <Home size={22} />
-        Home
-      </button>
-      <button
-        className={activePage === "profile" ? "active" : ""}
-        onClick={() => setActivePage("profile")}
-      >
-        <User size={22} />
-        Profile
-      </button>
-      <button
-        className={activePage === "settings" ? "active" : ""}
-        onClick={() => setActivePage("settings")}
-      >
-        <Settings size={22} />
-        Settings
-      </button>
+      {tabs.map(({ id, label, Icon }) => (
+        <button
+          key={id}
+          className={activePage === id ? "active" : ""}
+          onClick={() => setActivePage(id)}
+        >
+          {/* Yeh line error fix karti hai */}
+          {React.createElement(Icon, { size: 22 })}
+          {label}
+        </button>
+      ))}
     </nav>
   );
 }

@@ -4,33 +4,41 @@
     box-sizing: border-box;
 }
 
-/* Themes */
+/* ─── THEMES ─────────────────────────────── */
 body.theme-dark {
     --bg: #000000;
     --surface: #1c1c1e;
     --surface2: #111111;
     --border: #2a2a2a;
     --text: #ffffff;
+    --text2: #cccccc;
     --muted: #555555;
     --card: linear-gradient(135deg, #1a1a1a, #1c1c1e);
-    --input-bg: #111;
-    --input-border: #222;
-    --nav-bg: rgba(18, 18, 20, 0.85);
+    --input-bg: #111111;
+    --input-border: #222222;
+    --nav-bg: rgba(18, 18, 20, 0.9);
     --nav-border: rgba(255, 255, 255, 0.06);
+    --nav-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+    --nav-active-bg: rgba(48, 209, 88, 0.12);
+    --label-color: #555555;
 }
 
 body.theme-light {
-    --bg: #f2f2f7;
+    --bg: #f0f4ff;
     --surface: #ffffff;
-    --surface2: #f2f2f7;
-    --border: #e5e5ea;
-    --text: #000000;
-    --muted: #8e8e93;
-    --card: linear-gradient(135deg, #ffffff, #f9f9f9);
-    --input-bg: #f2f2f7;
-    --input-border: #e5e5ea;
-    --nav-bg: rgba(255, 255, 255, 0.85);
+    --surface2: #f5f7ff;
+    --border: #e0e4f0;
+    --text: #0a0a1a;
+    --text2: #333344;
+    --muted: #8888aa;
+    --card: linear-gradient(135deg, #ffffff, #f8f9ff);
+    --input-bg: #f0f4ff;
+    --input-border: #dde0ee;
+    --nav-bg: rgba(255, 255, 255, 0.92);
     --nav-border: rgba(0, 0, 0, 0.08);
+    --nav-shadow: 0 8px 40px rgba(100, 100, 200, 0.15);
+    --nav-active-bg: rgba(48, 209, 88, 0.1);
+    --label-color: #8888aa;
 }
 
 body {
@@ -40,10 +48,12 @@ body {
     max-width: 480px;
     margin: 0 auto;
     min-height: 100vh;
-    transition: background 0.3s ease;
+    transition:
+        background 0.3s ease,
+        color 0.3s ease;
 }
 
-/* Animations */
+/* ─── ANIMATIONS ─────────────────────────── */
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -84,11 +94,12 @@ body {
     opacity: 0;
 }
 
+/* ─── PAGE ───────────────────────────────── */
 .page {
     padding: 52px 16px 120px;
 }
 
-/* iOS Floating Nav */
+/* ─── FLOATING NAV ───────────────────────── */
 nav {
     position: fixed;
     bottom: 20px;
@@ -102,13 +113,11 @@ nav {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 10px 8px 10px;
+    padding: 8px 8px;
     border-radius: 28px;
     border: 1px solid var(--nav-border);
     z-index: 100;
-    box-shadow:
-        0 8px 40px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    box-shadow: var(--nav-shadow);
 }
 
 nav button {
@@ -122,7 +131,7 @@ nav button {
     align-items: center;
     gap: 3px;
     cursor: pointer;
-    padding: 6px 20px;
+    padding: 8px 22px;
     border-radius: 18px;
     letter-spacing: 0.3px;
     transition: all 0.2s ease;
@@ -130,23 +139,19 @@ nav button {
 
 nav button.active {
     color: #30d158;
-    background: rgba(48, 209, 88, 0.1);
+    background: var(--nav-active-bg);
 }
 
-nav button:not(.active):hover {
-    color: var(--text);
-}
-
-/* Modal */
+/* ─── MODAL ──────────────────────────────── */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 200;
     display: flex;
     align-items: flex-end;
     animation: fadeIn 0.2s ease;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
 }
 
 .modal-sheet {
@@ -156,4 +161,37 @@ nav button:not(.active):hover {
     width: 100%;
     animation: slideUp 0.3s ease;
     border-top: 1px solid var(--border);
+}
+
+/* ─── CARD ───────────────────────────────── */
+.card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 22px;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+}
+
+.card-label {
+    font-size: 0.7rem;
+    color: var(--label-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+}
+
+/* ─── INPUTS ─────────────────────────────── */
+.input {
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 14px;
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+}
+
+.input::placeholder {
+    color: var(--muted);
 }

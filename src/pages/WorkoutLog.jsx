@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { useSpring, animated } from "@react-spring/web";
 import { Dumbbell, Flame, CheckCircle, Clock, ChevronDown } from "lucide-react";
 
 const exerciseList = [
-  // Cardio
   { name: "Running (8 km/h)", met: 8.3, category: "Cardio" },
   { name: "Running (12 km/h)", met: 11.5, category: "Cardio" },
   { name: "Walking (5 km/h)", met: 3.5, category: "Cardio" },
@@ -16,17 +14,14 @@ const exerciseList = [
   { name: "Stair Climbing", met: 8.0, category: "Cardio" },
   { name: "Elliptical", met: 6.0, category: "Cardio" },
   { name: "Treadmill", met: 8.0, category: "Cardio" },
-  // Strength
   { name: "Weight Training", met: 5.0, category: "Strength" },
   { name: "Powerlifting", met: 6.0, category: "Strength" },
-  { name: "Bodyweight (Push-ups etc)", met: 4.5, category: "Strength" },
+  { name: "Bodyweight Training", met: 4.5, category: "Strength" },
   { name: "Kettlebell", met: 8.0, category: "Strength" },
   { name: "CrossFit", met: 10.0, category: "Strength" },
-  // HIIT
   { name: "HIIT", met: 10.0, category: "HIIT" },
   { name: "Tabata", met: 11.0, category: "HIIT" },
   { name: "Circuit Training", met: 8.0, category: "HIIT" },
-  // Sports
   { name: "Football", met: 8.0, category: "Sports" },
   { name: "Basketball", met: 8.0, category: "Sports" },
   { name: "Cricket", met: 5.0, category: "Sports" },
@@ -34,12 +29,10 @@ const exerciseList = [
   { name: "Tennis", met: 8.0, category: "Sports" },
   { name: "Volleyball", met: 6.0, category: "Sports" },
   { name: "Table Tennis", met: 4.5, category: "Sports" },
-  // Mind-Body
   { name: "Yoga", met: 3.0, category: "Mind-Body" },
   { name: "Pilates", met: 3.5, category: "Mind-Body" },
   { name: "Stretching", met: 2.5, category: "Mind-Body" },
   { name: "Meditation", met: 1.5, category: "Mind-Body" },
-  // Other
   { name: "Dancing", met: 5.5, category: "Other" },
   { name: "Martial Arts", met: 10.0, category: "Other" },
   { name: "Boxing", met: 9.0, category: "Other" },
@@ -69,6 +62,7 @@ function WorkoutLog() {
 
   const calGoal = Number(localStorage.getItem("goal_calories")) || 500;
   const isGoalDone = totalCal >= calGoal;
+  const percent = Math.min((totalCal / calGoal) * 100, 100);
 
   const categories = ["All", ...new Set(exerciseList.map((e) => e.category))];
   const filteredExercises =
@@ -79,13 +73,8 @@ function WorkoutLog() {
   const previewCal =
     name && duration ? getCalories(name, Number(duration)) : null;
 
-  const calBarWidth = useSpring({
-    width: `${Math.min((totalCal / calGoal) * 100, 100)}%`,
-    config: { tension: 120, friction: 20 },
-  });
-
   function addWorkout() {
-    if (name === "") {
+    if (!name) {
       alert("Please select an exercise!");
       return;
     }
@@ -93,14 +82,12 @@ function WorkoutLog() {
       alert("Duration must be between 1 and 300 minutes!");
       return;
     }
-
     const calories = getCalories(name, Number(duration));
     const newWorkouts = [
       ...workouts,
       { name, duration: Number(duration), calories },
     ];
     const newTotal = totalCal + calories;
-
     setWorkouts(newWorkouts);
     setTotalCal(newTotal);
     localStorage.setItem("workouts", JSON.stringify(newWorkouts));
@@ -110,26 +97,8 @@ function WorkoutLog() {
   }
 
   return (
-    <div
-      style={{
-        background: "var(--card)",
-        borderRadius: "24px",
-        padding: "22px",
-        marginBottom: "14px",
-        border: "1px solid var(--border)",
-      }}
-    >
-      <p
-        style={{
-          fontSize: "0.7rem",
-          color: "var(--muted)",
-          textTransform: "uppercase",
-          letterSpacing: "2px",
-          marginBottom: "6px",
-        }}
-      >
-        Workout Log
-      </p>
+    <div className="card">
+      <p className="card-label">Workout Log</p>
 
       <div
         style={{
@@ -155,7 +124,7 @@ function WorkoutLog() {
         {isGoalDone && <CheckCircle size={24} color="#ff9f0a" />}
       </div>
 
-      {/* Animated progress bar */}
+      {/* Progress bar */}
       <div
         style={{
           background: "var(--input-bg)",
@@ -165,15 +134,16 @@ function WorkoutLog() {
           overflow: "hidden",
         }}
       >
-        <animated.div
+        <div
           style={{
-            ...calBarWidth,
+            width: percent + "%",
             height: "100%",
             background: isGoalDone
               ? "#ff9f0a"
               : "linear-gradient(90deg, #ff9f0a, #ffcc00)",
             borderRadius: "99px",
-            boxShadow: "0 0 8px rgba(255,159,10,0.5)",
+            transition: "width 0.6s ease",
+            boxShadow: "0 0 8px rgba(255,159,10,0.4)",
           }}
         />
       </div>
@@ -200,7 +170,7 @@ function WorkoutLog() {
         </div>
       )}
 
-      {/* Exercise selector */}
+      {/* Exercise dropdown */}
       <div style={{ position: "relative", marginBottom: "10px" }}>
         <div
           onClick={() => setShowDropdown(!showDropdown)}
@@ -218,7 +188,7 @@ function WorkoutLog() {
             alignItems: "center",
           }}
         >
-          {name || "Select Exercise"}
+          <span>{name || "Select Exercise"}</span>
           <ChevronDown size={16} color="var(--muted)" />
         </div>
 
@@ -226,27 +196,25 @@ function WorkoutLog() {
           <div
             style={{
               position: "absolute",
-              top: "100%",
+              top: "110%",
               left: 0,
               right: 0,
-              background: "#1c1c1e",
-              border: "1px solid #2a2a2a",
+              background: "var(--surface)",
+              border: "1px solid var(--border)",
               borderRadius: "14px",
               zIndex: 50,
               maxHeight: "280px",
               overflow: "hidden",
-              marginTop: "6px",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
             }}
           >
-            {/* Category filter */}
             <div
               style={{
                 display: "flex",
                 gap: "6px",
                 padding: "10px",
                 overflowX: "auto",
-                borderBottom: "1px solid #2a2a2a",
+                borderBottom: "1px solid var(--border)",
               }}
             >
               {categories.map((cat) => (
@@ -258,8 +226,8 @@ function WorkoutLog() {
                     borderRadius: "99px",
                     border: "none",
                     background:
-                      selectedCategory === cat ? "#ff9f0a" : "#2a2a2a",
-                    color: selectedCategory === cat ? "#000" : "#888",
+                      selectedCategory === cat ? "#ff9f0a" : "var(--input-bg)",
+                    color: selectedCategory === cat ? "#000" : "var(--muted)",
                     fontSize: "0.75rem",
                     fontWeight: "600",
                     cursor: "pointer",
@@ -270,7 +238,6 @@ function WorkoutLog() {
                 </button>
               ))}
             </div>
-            {/* Exercise list */}
             <div style={{ overflowY: "auto", maxHeight: "200px" }}>
               {filteredExercises.map((ex) => (
                 <div
@@ -285,10 +252,10 @@ function WorkoutLog() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    borderBottom: "1px solid #1a1a1a",
+                    borderBottom: "1px solid var(--border)",
                   }}
                 >
-                  <span style={{ color: "#ccc", fontSize: "0.9rem" }}>
+                  <span style={{ color: "var(--text)", fontSize: "0.9rem" }}>
                     {ex.name}
                   </span>
                   <span style={{ color: "#ff9f0a", fontSize: "0.75rem" }}>
@@ -301,7 +268,7 @@ function WorkoutLog() {
         )}
       </div>
 
-      {/* Duration input */}
+      {/* Duration */}
       <div style={{ position: "relative", marginBottom: "10px" }}>
         <input
           type="number"
@@ -310,16 +277,8 @@ function WorkoutLog() {
           onChange={(e) => setDuration(e.target.value)}
           min={1}
           max={300}
-          style={{
-            width: "100%",
-            padding: "13px 16px",
-            background: "var(--input-bg)",
-            border: "1px solid var(--input-border)",
-            borderRadius: "14px",
-            color: "var(--text)",
-            fontSize: "1rem",
-            outline: "none",
-          }}
+          className="input"
+          style={{ paddingRight: "44px" }}
         />
         <Clock
           size={16}
@@ -333,7 +292,6 @@ function WorkoutLog() {
         />
       </div>
 
-      {/* Preview calories */}
       {previewCal && (
         <p
           style={{
@@ -360,7 +318,7 @@ function WorkoutLog() {
           fontSize: "1rem",
           fontWeight: "700",
           cursor: "pointer",
-          boxShadow: "0 4px 20px rgba(255, 159, 10, 0.3)",
+          boxShadow: "0 4px 20px rgba(255,159,10,0.3)",
         }}
       >
         <div
