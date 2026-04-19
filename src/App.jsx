@@ -9,7 +9,6 @@ function App() {
   const [activePage, setActivePage] = useState("home");
 
   useEffect(() => {
-    // Theme apply karo
     const theme = localStorage.getItem("theme") || "dark";
     document.body.className = `theme-${theme}`;
   }, []);
