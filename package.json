@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/cli": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
     "@react-spring/web": "^10.0.3",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
