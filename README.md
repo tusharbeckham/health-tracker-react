@@ -1,4 +1,4 @@
-# Health Tracker 🏥
+# Euexia
 
 A modern, cross-platform health tracking application built with **React + Vite** and powered by **Capacitor** for a native mobile experience.
 
