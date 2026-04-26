@@ -8,7 +8,6 @@ function StreakCard() {
   return (
     <div className="card">
       <p className="card-label">Current Streak</p>
-
       <div
         style={{
           display: "flex",

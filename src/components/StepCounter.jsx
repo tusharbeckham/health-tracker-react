@@ -2,58 +2,48 @@ import { useState, useEffect, useRef } from "react";
 import { Footprints, Trophy } from "lucide-react";
 
 function StepCounter() {
-  const [steps, setSteps] = useState(0);
-  const goal = Number(localStorage.getItem("goal_steps")) || 10000;
+  const today = new Date().toISOString().split("T")[0];
 
+  // Steps seedha localStorage se initialize karo
+  const [steps, setSteps] = useState(() => {
+    const savedDate = localStorage.getItem("steps_date");
+    const savedSteps = Number(localStorage.getItem("steps")) || 0;
+    if (savedDate !== today) {
+      localStorage.setItem("steps", "0");
+      localStorage.setItem("steps_date", today);
+      return 0;
+    }
+    return savedSteps;
+  });
+
+  const goal = Number(localStorage.getItem("goal_steps")) || 10000;
   const kms = (steps * 0.000762).toFixed(2);
   const calories = Math.round(steps * 0.04);
 
   const lastAccRef = useRef(0);
   const lastStepRef = useRef(0);
   const stepBufferRef = useRef([]);
+  const isMotionActive = useRef(false);
 
-  // ==================== DAILY RESET LOGIC ====================
+  // Save steps to localStorage
   useEffect(() => {
-    const resetIfNewDay = () => {
-      const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-
-      const savedDate = localStorage.getItem("steps_date");
-      const savedSteps = Number(localStorage.getItem("steps")) || 0;
-
-      if (savedDate !== today) {
-        // New day detected → Reset steps
-        localStorage.setItem("steps", "0");
-        localStorage.setItem("steps_date", today);
-        setSteps(0);
-      } else {
-        // Same day → Load previous steps
-        setSteps(savedSteps);
-      }
-    };
-
-    resetIfNewDay();
-  }, []);
-
-  // Save steps whenever it changes + update date
-  useEffect(() => {
-    const today = new Date().toISOString().split("T")[0];
     localStorage.setItem("steps", steps.toString());
     localStorage.setItem("steps_date", today);
+    localStorage.setItem("kms", kms);
+    localStorage.setItem("stepCalories", String(calories));
   }, [steps]);
 
-  // Save kms and calories
+  // Step detection — sirf ek baar mount pe
   useEffect(() => {
-    localStorage.setItem("kms", kms);
-    localStorage.setItem("stepCalories", calories);
-  }, [kms, calories]);
+    if (isMotionActive.current) return;
 
-  // ==================== STEP DETECTION ====================
-  useEffect(() => {
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
-      if (!acc) return;
+      if (!acc || acc.x == null) return;
 
-      const magnitude = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+      const magnitude = Math.sqrt(
+        (acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2,
+      );
 
       stepBufferRef.current.push(magnitude);
       if (stepBufferRef.current.length > 6) stepBufferRef.current.shift();
@@ -65,7 +55,13 @@ function StepCounter() {
       const delta = Math.abs(avg - lastAccRef.current);
       const now = Date.now();
 
-      if (delta > 2.8 && delta < 18 && now - lastStepRef.current > 450) {
+      // Strict conditions — false steps avoid karo
+      if (
+        delta > 3.5 &&
+        delta < 15 &&
+        now - lastStepRef.current > 500 &&
+        magnitude > 8 // Phone actually move ho raha hai
+      ) {
         lastStepRef.current = now;
         setSteps((prev) => prev + 1);
       }
@@ -74,6 +70,7 @@ function StepCounter() {
     }
 
     const startMotion = () => {
+      isMotionActive.current = true;
       window.addEventListener("devicemotion", handleMotion);
     };
 
@@ -92,6 +89,7 @@ function StepCounter() {
 
     return () => {
       window.removeEventListener("devicemotion", handleMotion);
+      isMotionActive.current = false;
     };
   }, []);
 
@@ -152,7 +150,6 @@ function StepCounter() {
             {kms} km
           </p>
         </div>
-
         <div
           style={{
             background: "var(--surface2)",
