@@ -4,7 +4,6 @@ import { Footprints, Trophy } from "lucide-react";
 function StepCounter() {
   const today = new Date().toISOString().split("T")[0];
 
-  // Steps seedha localStorage se initialize karo
   const [steps, setSteps] = useState(() => {
     const savedDate = localStorage.getItem("steps_date");
     const savedSteps = Number(localStorage.getItem("steps")) || 0;
@@ -24,8 +23,8 @@ function StepCounter() {
   const lastStepRef = useRef(0);
   const stepBufferRef = useRef([]);
   const isMotionActive = useRef(false);
+  const warmupRef = useRef(0);
 
-  // Save steps to localStorage
   useEffect(() => {
     localStorage.setItem("steps", steps.toString());
     localStorage.setItem("steps_date", today);
@@ -33,17 +32,29 @@ function StepCounter() {
     localStorage.setItem("stepCalories", String(calories));
   }, [steps]);
 
-  // Step detection — sirf ek baar mount pe
   useEffect(() => {
     if (isMotionActive.current) return;
 
+    // Reset warmup on mount
+    warmupRef.current = 0;
+    stepBufferRef.current = [];
+    lastAccRef.current = 0;
+    lastStepRef.current = 0;
+
     function handleMotion(event) {
       const acc = event.accelerationIncludingGravity;
-      if (!acc || acc.x == null) return;
+      if (!acc || acc.x == null || acc.y == null || acc.z == null) return;
 
       const magnitude = Math.sqrt(
         (acc.x || 0) ** 2 + (acc.y || 0) ** 2 + (acc.z || 0) ** 2,
       );
+
+      // Warmup — pehli 10 readings ignore karo
+      warmupRef.current += 1;
+      if (warmupRef.current < 10) {
+        lastAccRef.current = magnitude;
+        return;
+      }
 
       stepBufferRef.current.push(magnitude);
       if (stepBufferRef.current.length > 6) stepBufferRef.current.shift();
@@ -55,12 +66,11 @@ function StepCounter() {
       const delta = Math.abs(avg - lastAccRef.current);
       const now = Date.now();
 
-      // Strict conditions — false steps avoid karo
       if (
         delta > 3.5 &&
         delta < 15 &&
         now - lastStepRef.current > 500 &&
-        magnitude > 8 // Phone actually move ho raha hai
+        magnitude > 8
       ) {
         lastStepRef.current = now;
         setSteps((prev) => prev + 1);
